@@ -29,7 +29,7 @@ class LoadMultiPressureDatasetTorch(torch.utils.data.Dataset):
         self.num_pressure_conditions = num_pressure_conditions
 
         all_data = np.loadtxt(src_file, max_rows=m_rows,
-                              usecols=columns, delimiter="  ",
+                              usecols=columns, delimiter=None,
                               comments="#", skiprows=0, dtype=np.float64)
 
         ncolumns = len(all_data[0])
@@ -81,9 +81,10 @@ def train_model(model, criterion, optimizer, dataloader, num_epochs=100, patienc
     # Split the data into training and validation sets
     train_len = int((1.0 - val_split) * len(dataloader.dataset))
     val_len = len(dataloader.dataset) - train_len
+
     train_dataset, val_dataset = random_split(dataloader.dataset, [train_len, val_len])
 
-    train_loader = DataLoader(dataloader.dataset, batch_size=dataloader.batch_size, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=dataloader.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=dataloader.batch_size, shuffle=False)
 
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -91,7 +92,7 @@ def train_model(model, criterion, optimizer, dataloader, num_epochs=100, patienc
 
     # Early stopping details
     n_epochs_stop = patience
-    min_val_loss = np.Inf
+    min_val_loss = np.inf
     epochs_no_improve = 0
 
     # To track loss history
@@ -209,14 +210,14 @@ def plot_results(targets, outputs, output_size):
             axs[i].tick_params(left=False)
 
     plt.tight_layout()
-    plt.savefig(os.path.join('images', 'NeuralNet.pdf'))
+    plt.savefig(os.path.join('Images', 'NeuralNet.pdf'))
     # plt.show()
 
 
 
 
 def plot_loss_curves(history, log_scale=False):
-    plt.rcParams.update({'font.size': 16, 'text.usetex': True})
+    plt.rcParams.update({'font.size': 16, 'text.usetex': False})
     plt.figure(figsize=(9, 6))
     plt.plot(history['train_loss'],"-o", markersize=3, label='Training Loss')
     plt.plot(history['val_loss'], "-o", markersize=3, label='Validation Loss')
@@ -228,7 +229,7 @@ def plot_loss_curves(history, log_scale=False):
         plt.yscale('log')
     plt.legend(fontsize=14)
     plt.grid(True)
-    plt.savefig(os.path.join('images', 'NeuralNet_loss_curves.pdf'))
+    plt.savefig(os.path.join('Images', 'NeuralNet_loss_curves.pdf'))
     # plt.show()
 
 
@@ -373,7 +374,7 @@ if __name__ == "__main__":
     torch.manual_seed(8) # for reproducibility
 
     # Select scheme
-    scheme = 'O2_simple'
+    scheme = 'O2_novib'
 
     # Parameters for data loading
     src_file_train = dictionary[scheme]['main_dataset']

@@ -19,7 +19,7 @@ class LoadMultiPressureDatasetNumpy:
         self.num_pressure_conditions = num_pressure_conditions
 
         all_data = np.loadtxt(src_file, max_rows=m_rows,
-                              usecols=columns, delimiter="  ",
+                              usecols=columns, delimiter=None,
                               comments="#", skiprows=0, dtype=np.float64)
 
         ncolumns = len(all_data[0])
