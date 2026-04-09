@@ -1,0 +1,51 @@
+{
+    "scheme": "O2_novib",
+    "experiment_name": "4_species_O2(X)_O2(a)_O2(b)_O(3P)",
+    "run_timestamp": "2026-04-09_15-31-41",
+    "hidden_size": [
+        30,
+        30,
+        30
+    ],
+    "depth": 3,
+    "num_parameters": 2223,
+    "input_size": 8,
+    "output_size": 3,
+    "num_pressure_conditions": 2,
+    "num_species_total": 11,
+    "num_species_kept": 4,
+    "kept_species": [
+        "O2(X)",
+        "O2(a)",
+        "O2(b)",
+        "O(3P)"
+    ],
+    "removed_species": [
+        "O2(Hz)",
+        "O2+(X)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(X)",
+        "O3(exc)"
+    ],
+    "activation": "tanh",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "epochs_ran": 1981,
+    "best_epoch": 1881,
+    "final_train_loss": 4.4971293568273215e-06,
+    "final_val_loss": 4.794723836312187e-06,
+    "best_val_loss": 2.6513104148762067e-06,
+    "test_mse": 2.3603831778018503e-06,
+    "test_rmse": 0.0015363538582637303,
+    "test_mse_unscaled": 2.802596928649634e-45,
+    "test_rmse_unscaled": 5.293955920339377e-23,
+    "training_time_s": 162.19987988471985,
+    "mean_rel_error_k1": 0.003271423978731036,
+    "max_rel_error_k1": 0.018380889669060707,
+    "mean_rel_error_k2": 0.0012368978932499886,
+    "max_rel_error_k2": 0.0042059822008013725,
+    "mean_rel_error_k3": 0.001550937187857926,
+    "max_rel_error_k3": 0.004609719384461641
+}

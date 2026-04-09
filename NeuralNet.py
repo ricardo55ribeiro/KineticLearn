@@ -258,10 +258,6 @@ def plot_loss_curves(history, output_dir, log_scale=False):
 
     plt.figure(figsize=(9, 6))
 
-    # Raw curves: faint and thin
-    plt.plot(epochs, train_loss, linewidth=0.8, alpha=0.20, label='Training Loss (raw)')
-    plt.plot(epochs, val_loss, linewidth=0.8, alpha=0.20, label='Validation Loss (raw)')
-
     # Smoothed curves: the ones you actually read
     plt.plot(epochs, train_smooth, linewidth=1.8, label='Training Loss')
     plt.plot(epochs, val_smooth, linewidth=1.8, label='Validation Loss')
@@ -678,7 +674,8 @@ if __name__ == "__main__":
     }
 
     # Inputs for degradation experiment
-    kept_species = ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"]
+    # Reference: "O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"
+    kept_species = ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)",]
     kept_cols = []
     for p in range(num_pressure_conditions):
         for species in kept_species:
@@ -708,7 +705,7 @@ if __name__ == "__main__":
     output_size = len(dictionary[scheme]['k_columns'])  # 3 coefficients
     
 
-    experiment_name = f"{len(kept_species)}_species_" + "_".join(kept_species)
+    experiment_name = f"{len(kept_species)}__" + "_".join(kept_species)
 
     activation = "tanh"
     learning_rate = 0.0001
