@@ -17,7 +17,7 @@ from sklearn import preprocessing
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 import sys
-import shutil
+from datetime import datetime
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 from src.NeuralNetworkModels import NeuralNet
@@ -220,19 +220,47 @@ def plot_results(targets, outputs, output_size, output_dir):
 
 
 
+def moving_average(x, window=25):
+    x = np.asarray(x, dtype=float)
+    if window <= 1:
+        return x
+    kernel = np.ones(window) / window
+    pad_left = window // 2
+    pad_right = window - 1 - pad_left
+    x_padded = np.pad(x, (pad_left, pad_right), mode="edge")
+    return np.convolve(x_padded, kernel, mode="valid")
+
+
 def plot_loss_curves(history, output_dir, log_scale=False):
     plt.rcParams.update({'font.size': 16, 'text.usetex': False})
+
+    train_loss = np.array(history['train_loss'])
+    val_loss = np.array(history['val_loss'])
+    epochs = np.arange(1, len(train_loss) + 1)
+
+    # Smoothed curves for readability
+    train_smooth = moving_average(train_loss, window=25)
+    val_smooth = moving_average(val_loss, window=25)
+
     plt.figure(figsize=(9, 6))
-    plt.plot(history['train_loss'],"-o", markersize=3, label='Training Loss')
-    plt.plot(history['val_loss'], "-o", markersize=3, label='Validation Loss')
-    # plt.title('Loss history')
+
+    # Raw curves: faint and thin
+    plt.plot(epochs, train_loss, linewidth=0.8, alpha=0.20, label='Training Loss (raw)')
+    plt.plot(epochs, val_loss, linewidth=0.8, alpha=0.20, label='Validation Loss (raw)')
+
+    # Smoothed curves: the ones you actually read
+    plt.plot(epochs, train_smooth, linewidth=1.8, label='Training Loss')
+    plt.plot(epochs, val_smooth, linewidth=1.8, label='Validation Loss')
+
     plt.xlabel('Epoch', fontsize=16)
     plt.ylabel('MSE Loss', fontsize=16)
-    # log y scale
+
     if log_scale:
         plt.yscale('log')
-    plt.legend(fontsize=14)
-    plt.grid(True)
+
+    plt.grid(True, which='both', alpha=0.25)
+    plt.legend(fontsize=13, frameon=False)
+    plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'NeuralNet_loss_curves.pdf'))
     plt.close()
 
@@ -378,14 +406,18 @@ def arch_to_folder_name(hidden_size):
     return ", ".join(map(str, hidden_size))
 
 
-def prepare_results_folders(architectures, root="Results"):
-    # Delete the entire Results folder if it already exists
-    if os.path.exists(root):
-        shutil.rmtree(root)
+def make_results_root(base_root, scheme, experiment_name, add_timestamp=True):
+    root = os.path.join(base_root, scheme, experiment_name)
+
+    if add_timestamp:
+        run_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        root = os.path.join(root, run_id)
 
     os.makedirs(root, exist_ok=True)
+    return root
 
-    # Create one folder per architecture
+
+def prepare_results_folders(architectures, root):
     arch_dirs = {}
     for arch in architectures:
         folder_name = arch_to_folder_name(arch)
@@ -396,16 +428,75 @@ def prepare_results_folders(architectures, root="Results"):
     return arch_dirs
 
 
-def save_metrics(arch_dir, hidden_size, mse, training_time, scheme):
+def compute_metrics_dict(
+    scheme,
+    hidden_size,
+    input_size,
+    output_size,
+    activation,
+    learning_rate,
+    batch_size,
+    loss_history,
+    training_time,
+    mse,
+    targets,
+    outputs
+):
     metrics = {
         "scheme": scheme,
         "hidden_size": list(hidden_size),
-        "mse": float(mse),
+        "input_size": int(input_size),
+        "output_size": int(output_size),
+        "activation": activation,
+        "learning_rate": float(learning_rate),
+        "batch_size": int(batch_size),
+        "epochs_ran": len(loss_history["train_loss"]),
+        "final_train_loss": float(loss_history["train_loss"][-1]),
+        "final_val_loss": float(loss_history["val_loss"][-1]),
+        "best_val_loss": float(min(loss_history["val_loss"])),
+        "test_mse": float(mse),
         "training_time_s": float(training_time),
     }
 
+    for i in range(output_size):
+        denominator = outputs[:, i].copy()
+        denominator[np.abs(denominator) < 1e-9] = 1e-9
+        rel_err = np.abs((outputs[:, i] - targets[:, i]) / denominator)
+
+        metrics[f"mean_rel_error_k{i+1}"] = float(rel_err.mean())
+        metrics[f"max_rel_error_k{i+1}"] = float(rel_err.max())
+
+    return metrics
+
+
+def save_metrics_files(arch_dir, metrics):
+    # JSON
     with open(os.path.join(arch_dir, "metrics.json"), "w") as f:
         json.dump(metrics, f, indent=4)
+
+    # TXT
+    lines = [
+        f"Scheme: {metrics['scheme']}",
+        f"Hidden size: {metrics['hidden_size']}",
+        f"Input size: {metrics['input_size']}",
+        f"Output size: {metrics['output_size']}",
+        f"Activation: {metrics['activation']}",
+        f"Learning rate: {metrics['learning_rate']}",
+        f"Batch size: {metrics['batch_size']}",
+        f"Epochs ran: {metrics['epochs_ran']}",
+        f"Final train loss: {metrics['final_train_loss']}",
+        f"Final val loss: {metrics['final_val_loss']}",
+        f"Best val loss: {metrics['best_val_loss']}",
+        f"Test MSE: {metrics['test_mse']}",
+        f"Training time (s): {metrics['training_time_s']}",
+    ]
+
+    for i in range(metrics["output_size"]):
+        lines.append(f"Mean relative error k{i+1}: {metrics[f'mean_rel_error_k{i+1}']}")
+        lines.append(f"Max relative error k{i+1}: {metrics[f'max_rel_error_k{i+1}']}")
+
+    with open(os.path.join(arch_dir, "metrics.txt"), "w") as f:
+        f.write("\n".join(lines))
 
 
 def save_predictions_csv(arch_dir, targets, outputs):
@@ -413,13 +504,37 @@ def save_predictions_csv(arch_dir, targets, outputs):
     n_outputs = targets.shape[1]
 
     for i in range(n_outputs):
+        denominator = outputs[:, i].copy()
+        denominator[np.abs(denominator) < 1e-9] = 1e-9
+        rel_err = np.abs((outputs[:, i] - targets[:, i]) / denominator)
+
         data[f"k{i+1}_true"] = targets[:, i]
         data[f"k{i+1}_pred"] = outputs[:, i]
+        data[f"k{i+1}_rel_err"] = rel_err
 
     df = pd.DataFrame(data)
     df.to_csv(os.path.join(arch_dir, "predictions.csv"), index=False)
 
 
+def save_global_summary(results_root, all_metrics):
+    lines = []
+    lines.append("Architecture comparison summary")
+    lines.append("")
+
+    for metrics in all_metrics:
+        lines.append(f"Architecture: {metrics['hidden_size']}")
+        lines.append(f"  Test MSE: {metrics['test_mse']}")
+        lines.append(f"  Best val loss: {metrics['best_val_loss']}")
+        lines.append(f"  Final train loss: {metrics['final_train_loss']}")
+        lines.append(f"  Final val loss: {metrics['final_val_loss']}")
+        lines.append(f"  Training time (s): {metrics['training_time_s']}")
+        for i in range(metrics["output_size"]):
+            lines.append(f"  Mean rel err k{i+1}: {metrics[f'mean_rel_error_k{i+1}']}")
+            lines.append(f"  Max rel err k{i+1}: {metrics[f'max_rel_error_k{i+1}']}")
+        lines.append("")
+
+    with open(os.path.join(results_root, "summary.txt"), "w") as f:
+        f.write("\n".join(lines))
 
 
 
@@ -453,17 +568,33 @@ if __name__ == "__main__":
     input_size = int(nspecies*num_pressure_conditions)  # 11 densities per each pressure condition
     output_size = len(dictionary[scheme]['k_columns'])  # 3 coefficients
     
-    
+
+
+
+    # Experiment Setup
+    experiment_name = "all_inputs"
 
     architectures = [
         (30, 30),
         (50, 50),
         (30, 30, 30),
+        (30, 30, 30, 30),
     ]
 
-    arch_dirs = prepare_results_folders(architectures, root="Results")
+    results_root = make_results_root(
+        base_root="Results_NN",
+        scheme=scheme,
+        experiment_name=experiment_name,
+        add_timestamp=True
+    )
+
+    arch_dirs = prepare_results_folders(architectures, root=results_root)
 
     results = []
+
+    activation = "tanh"
+    learning_rate = 0.0001
+    batch_size = 16
 
     for hidden_size in architectures:
         print(f"\n--- Testing architecture: {hidden_size} ---")
@@ -472,13 +603,13 @@ if __name__ == "__main__":
 
         torch.manual_seed(43)
 
-        model = NeuralNet(input_size, output_size, hidden_size, activ_f='tanh')
+        model = NeuralNet(input_size, output_size, hidden_size, activ_f=activation)
 
         criterion = MSELoss()
-        optimizer = Adam(model.parameters(), lr=0.0001)
+        optimizer = Adam(model.parameters(), lr=learning_rate)
 
         # Shuffle already happens inside 'train_model' (therefore, changed shuffle=True to shuffle=False) 
-        train_loader = DataLoader(dataset_train, batch_size=16, shuffle=False)
+        train_loader = DataLoader(dataset_train, batch_size=batch_size, shuffle=False)
 
         start = time.time()
 
@@ -492,8 +623,24 @@ if __name__ == "__main__":
         # Save model
         torch.save(model.state_dict(), os.path.join(arch_dir, "model.pth"))
 
-        # Save metrics
-        save_metrics(arch_dir, hidden_size, mse, end - start, scheme)
+        # Compute metrics
+        metrics = compute_metrics_dict(
+            scheme=scheme,
+            hidden_size=hidden_size,
+            input_size=input_size,
+            output_size=output_size,
+            activation=activation,
+            learning_rate=learning_rate,
+            batch_size=batch_size,
+            loss_history=loss_history,
+            training_time=end - start,
+            mse=mse,
+            targets=targets.numpy(),
+            outputs=outputs.numpy()
+        )
+
+        # Save metrics in JSON and TXT
+        save_metrics_files(arch_dir, metrics)
 
         # Save predictions
         save_predictions_csv(arch_dir, targets.numpy(), outputs.numpy())
@@ -502,8 +649,10 @@ if __name__ == "__main__":
         plot_results(targets.numpy(), outputs.numpy(), output_size, arch_dir)
         plot_loss_curves(loss_history, arch_dir, log_scale=True)
 
-        results.append({"hidden_size": hidden_size, "mse": mse, "training_time": end - start})
+        results.append(metrics)
 
         print(f"Architecture: {hidden_size}")
         print(f"Training time: {end - start}s")
         print(f"Test MSE: {mse}")
+
+    save_global_summary(results_root, results)
