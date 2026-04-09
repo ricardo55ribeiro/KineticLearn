@@ -675,7 +675,7 @@ if __name__ == "__main__":
 
     # Inputs for degradation experiment
     # Reference: "O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"
-    kept_species = ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)",]
+    kept_species = ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)"]
     kept_cols = []
     for p in range(num_pressure_conditions):
         for species in kept_species:
