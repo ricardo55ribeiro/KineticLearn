@@ -17,6 +17,7 @@ from sklearn import preprocessing
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 import sys
+import shutil
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 from src.NeuralNetworkModels import NeuralNet
@@ -82,9 +83,13 @@ def train_model(model, criterion, optimizer, dataloader, num_epochs=100, patienc
     train_len = int((1.0 - val_split) * len(dataloader.dataset))
     val_len = len(dataloader.dataset) - train_len
 
-    train_dataset, val_dataset = random_split(dataloader.dataset, [train_len, val_len])
+    # Train/validation split with seed so every architecture is compared on exactly the same data partition
+    split_generator = torch.Generator().manual_seed(43)
+    train_dataset, val_dataset = random_split(dataloader.dataset, [train_len, val_len], generator=split_generator)
 
-    train_loader = DataLoader(train_dataset, batch_size=dataloader.batch_size, shuffle=True)
+    # Training shuffle order with seed so every architecture sees the mini-batches in the same sequence
+    shuffle_generator = torch.Generator().manual_seed(43)
+    train_loader = DataLoader(train_dataset, batch_size=dataloader.batch_size, shuffle=True, generator=shuffle_generator)
     val_loader = DataLoader(val_dataset, batch_size=dataloader.batch_size, shuffle=False)
 
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -169,10 +174,10 @@ def evaluate_model(model, test_data):
 
     return targets, outputs, mse
 
-def plot_results(targets, outputs, output_size):
+def plot_results(targets, outputs, output_size, output_dir):
     # Plot the predictions vs the true values
     fig, axs = plt.subplots(1, output_size, figsize=(15, 5), sharey=True)  # Share the same y-axis
-    plt.rcParams.update({'font.size': 16, 'text.usetex': True} )
+    plt.rcParams.update({'font.size': 16, 'text.usetex': False} )
 
     for i in range(output_size):
         axs[i].scatter(targets[:, i], outputs[:, i], alpha=0.8, color=(0., 0., 0.9)) # blue
@@ -185,7 +190,7 @@ def plot_results(targets, outputs, output_size):
         axs[i].set_title(f"$k_{{{i+1}}}$")
 
         # Calculate relative error
-        denominator = outputs[:,i]
+        denominator = outputs[:, i].copy()
         denominator[np.abs(denominator) < 1e-9] = 1e-9  # Set small values to a small constant
 
         rel_err = np.abs(np.subtract(outputs[:,i], targets[:, i]) / denominator)
@@ -210,13 +215,12 @@ def plot_results(targets, outputs, output_size):
             axs[i].tick_params(left=False)
 
     plt.tight_layout()
-    plt.savefig(os.path.join('Images', 'NeuralNet.pdf'))
-    # plt.show()
+    plt.savefig(os.path.join(output_dir, 'NeuralNet.pdf'))
+    plt.close()
 
 
 
-
-def plot_loss_curves(history, log_scale=False):
+def plot_loss_curves(history, output_dir, log_scale=False):
     plt.rcParams.update({'font.size': 16, 'text.usetex': False})
     plt.figure(figsize=(9, 6))
     plt.plot(history['train_loss'],"-o", markersize=3, label='Training Loss')
@@ -229,9 +233,8 @@ def plot_loss_curves(history, log_scale=False):
         plt.yscale('log')
     plt.legend(fontsize=14)
     plt.grid(True)
-    plt.savefig(os.path.join('Images', 'NeuralNet_loss_curves.pdf'))
-    # plt.show()
-
+    plt.savefig(os.path.join(output_dir, 'NeuralNet_loss_curves.pdf'))
+    plt.close()
 
 
 
@@ -370,6 +373,56 @@ class CustomEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+
+def arch_to_folder_name(hidden_size):
+    return ", ".join(map(str, hidden_size))
+
+
+def prepare_results_folders(architectures, root="Results"):
+    # Delete the entire Results folder if it already exists
+    if os.path.exists(root):
+        shutil.rmtree(root)
+
+    os.makedirs(root, exist_ok=True)
+
+    # Create one folder per architecture
+    arch_dirs = {}
+    for arch in architectures:
+        folder_name = arch_to_folder_name(arch)
+        arch_dir = os.path.join(root, folder_name)
+        os.makedirs(arch_dir, exist_ok=True)
+        arch_dirs[arch] = arch_dir
+
+    return arch_dirs
+
+
+def save_metrics(arch_dir, hidden_size, mse, training_time, scheme):
+    metrics = {
+        "scheme": scheme,
+        "hidden_size": list(hidden_size),
+        "mse": float(mse),
+        "training_time_s": float(training_time),
+    }
+
+    with open(os.path.join(arch_dir, "metrics.json"), "w") as f:
+        json.dump(metrics, f, indent=4)
+
+
+def save_predictions_csv(arch_dir, targets, outputs):
+    data = {}
+    n_outputs = targets.shape[1]
+
+    for i in range(n_outputs):
+        data[f"k{i+1}_true"] = targets[:, i]
+        data[f"k{i+1}_pred"] = outputs[:, i]
+
+    df = pd.DataFrame(data)
+    df.to_csv(os.path.join(arch_dir, "predictions.csv"), index=False)
+
+
+
+
+
 if __name__ == "__main__":
     torch.manual_seed(8) # for reproducibility
 
@@ -401,43 +454,56 @@ if __name__ == "__main__":
     output_size = len(dictionary[scheme]['k_columns'])  # 3 coefficients
     
     
-    hidden_size = (30, 30)  # example value, can be tuned
-    model = NeuralNet(input_size, output_size, hidden_size, activ_f='tanh')
 
-    # Define the loss function and the optimizer
-    criterion = MSELoss()
-    optimizer = Adam(model.parameters(), lr=0.0001) 
+    architectures = [
+        (30, 30),
+        (50, 50),
+        (30, 30, 30),
+    ]
 
-    start = time.time()
+    arch_dirs = prepare_results_folders(architectures, root="Results")
 
-    # # Hyperparameter search
-    # model, hyperparameters, results = hyperparameter_grid_search()
-    
-    # # Save the results
-    # with open('results_augmented'+scheme+'.json', 'w') as f:
-    #     json.dump(results, f, cls=CustomEncoder)
+    results = []
 
-    # print(f"Best hyperparameters: lr={hyperparameters[0]}, batch_size={hyperparameters[1]}, hidden_size={hyperparameters[2]}, activation_function={hyperparameters[3]}")
-    
-    # Create data loaders
-    train_loader = DataLoader(dataset_train, batch_size=16, shuffle=True)  # batch size can be tuned
+    for hidden_size in architectures:
+        print(f"\n--- Testing architecture: {hidden_size} ---")
 
-    # Train the model
-    model, loss_history = train_model(model, criterion, optimizer, train_loader, num_epochs=5000, patience=100, val_split=0.1)
+        arch_dir = arch_dirs[hidden_size]
 
-    end = time.time()
-    print(f"Training time: {end - start}s")
+        torch.manual_seed(43)
 
-    # Evaluate the model
-    test_data = DataLoader(dataset_test, batch_size=len(dataset_test))
-    targets, outputs, mse = evaluate_model(model, test_data)
+        model = NeuralNet(input_size, output_size, hidden_size, activ_f='tanh')
 
-    # Print mse value for the test data
-    print(f"Mean Squared Error (MSE) on the test data: {mse}")
-    
-    # Plot results
-    # plot_results(targets.numpy(), outputs.numpy(), output_size)
+        criterion = MSELoss()
+        optimizer = Adam(model.parameters(), lr=0.0001)
 
-    # Plot loss curves
-    plot_loss_curves(loss_history, log_scale=True)
-    
+        # Shuffle already happens inside 'train_model' (therefore, changed shuffle=True to shuffle=False) 
+        train_loader = DataLoader(dataset_train, batch_size=16, shuffle=False)
+
+        start = time.time()
+
+        model, loss_history = train_model(model, criterion, optimizer, train_loader, num_epochs=5000, patience=100, val_split=0.1)
+
+        end = time.time()
+
+        test_data = DataLoader(dataset_test, batch_size=len(dataset_test))
+        targets, outputs, mse = evaluate_model(model, test_data)
+
+        # Save model
+        torch.save(model.state_dict(), os.path.join(arch_dir, "model.pth"))
+
+        # Save metrics
+        save_metrics(arch_dir, hidden_size, mse, end - start, scheme)
+
+        # Save predictions
+        save_predictions_csv(arch_dir, targets.numpy(), outputs.numpy())
+
+        # Save plots
+        plot_results(targets.numpy(), outputs.numpy(), output_size, arch_dir)
+        plot_loss_curves(loss_history, arch_dir, log_scale=True)
+
+        results.append({"hidden_size": hidden_size, "mse": mse, "training_time": end - start})
+
+        print(f"Architecture: {hidden_size}")
+        print(f"Training time: {end - start}s")
+        print(f"Test MSE: {mse}")
