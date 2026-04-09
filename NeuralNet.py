@@ -8,7 +8,6 @@ import random
 import itertools
 import json
 import pandas as pd
-import seaborn as sns
 from torch.utils.data import DataLoader
 from torch.utils.data import random_split
 from torch.nn import MSELoss
@@ -39,12 +38,19 @@ class LoadMultiPressureDatasetTorch(torch.utils.data.Dataset):
         if react_idx is None:
             y_columns = np.arange(0, ncolumns - nspecies, 1)
 
-        x_data = all_data[:, x_columns]  # densities
-        y_data = all_data[:, y_columns] * 1e30  # k's  # *10 to avoid being at float32 precision limit 1e-17
+        raw_x_data = all_data[:, x_columns].copy()          # original densities
+        raw_y_data = all_data[:, y_columns].copy()          # original k values
 
-        # Reshape data for multiple pressure conditions
+        x_data = raw_x_data.copy()
+        y_data = raw_y_data * 1e30
+
+        # Reshape scaled data
         x_data = x_data.reshape(num_pressure_conditions, -1, x_data.shape[1])
         y_data = y_data.reshape(num_pressure_conditions, -1, y_data.shape[1])
+
+        # Reshape unscaled/original data
+        raw_x_data = raw_x_data.reshape(num_pressure_conditions, -1, raw_x_data.shape[1])
+        raw_y_data = raw_y_data.reshape(num_pressure_conditions, -1, raw_y_data.shape[1])
 
         # Create scalers
         self.scaler_input = scaler_input or [preprocessing.MaxAbsScaler() for _ in range(num_pressure_conditions)]
@@ -58,15 +64,23 @@ class LoadMultiPressureDatasetTorch(torch.utils.data.Dataset):
             x_data[i] = self.scaler_input[i].transform(x_data[i])
             y_data[i] = self.scaler_output[i].transform(y_data[i])
 
-        # Transpose x_data to move the pressure condition axis to the end, then flatten
+        # Flatten scaled data
         x_data = np.transpose(x_data, (1, 0, 2)).reshape(-1, self.num_pressure_conditions * x_data.shape[-1])
-        
-        # Flatten the output data to be of shape (2000,3)
         y_data = y_data[0]
 
-        # Convert the data to PyTorch tensors
+        # Flatten unscaled/original data
+        raw_x_data = np.transpose(raw_x_data, (1, 0, 2)).reshape(-1, self.num_pressure_conditions * raw_x_data.shape[-1])
+        raw_y_data = raw_y_data[0]
+
+        # Convert to tensors
         self.x_data = torch.from_numpy(x_data).float()
         self.y_data = torch.from_numpy(y_data).float()
+
+        self.x_data_unscaled = torch.from_numpy(raw_x_data).float()
+        self.y_data_unscaled = torch.from_numpy(raw_y_data).float()
+    
+    def get_unscaled_data(self):
+        return self.x_data_unscaled, self.y_data_unscaled
 
     def __getitem__(self, index):
         return self.x_data[index], self.y_data[index]
@@ -393,15 +407,6 @@ def hyperparameter_grid_search():
     return best_model, best_hyperparameters, results
 
 
-# Custom JSON encoder to handle float32 values
-class CustomEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.float32):
-            return float(obj)
-        return super().default(obj)
-
-
-
 def arch_to_folder_name(hidden_size):
     return ", ".join(map(str, hidden_size))
 
@@ -430,31 +435,54 @@ def prepare_results_folders(architectures, root):
 
 def compute_metrics_dict(
     scheme,
+    experiment_name,
+    run_timestamp,
     hidden_size,
     input_size,
     output_size,
     activation,
     learning_rate,
     batch_size,
+    num_pressure_conditions,
+    num_species_total,
+    num_species_kept,
+    kept_species,
+    removed_species,
+    num_parameters,
     loss_history,
     training_time,
     mse,
+    mse_unscaled,
+    rmse_unscaled,
     targets,
     outputs
 ):
     metrics = {
         "scheme": scheme,
+        "experiment_name": experiment_name,
+        "run_timestamp": run_timestamp,
         "hidden_size": list(hidden_size),
+        "depth": len(hidden_size),
+        "num_parameters": int(num_parameters),
         "input_size": int(input_size),
         "output_size": int(output_size),
+        "num_pressure_conditions": int(num_pressure_conditions),
+        "num_species_total": int(num_species_total),
+        "num_species_kept": int(num_species_kept),
+        "kept_species": kept_species,
+        "removed_species": removed_species,
         "activation": activation,
         "learning_rate": float(learning_rate),
         "batch_size": int(batch_size),
         "epochs_ran": len(loss_history["train_loss"]),
+        "best_epoch": int(np.argmin(loss_history["val_loss"]) + 1),
         "final_train_loss": float(loss_history["train_loss"][-1]),
         "final_val_loss": float(loss_history["val_loss"][-1]),
         "best_val_loss": float(min(loss_history["val_loss"])),
         "test_mse": float(mse),
+        "test_rmse": float(np.sqrt(mse)),
+        "test_mse_unscaled": float(mse_unscaled),
+        "test_rmse_unscaled": float(rmse_unscaled),
         "training_time_s": float(training_time),
     }
 
@@ -476,18 +504,15 @@ def save_metrics_files(arch_dir, metrics):
 
     # TXT
     lines = [
+        f"Experiment name: {metrics['experiment_name']}",
+        f"Run timestamp: {metrics['run_timestamp']}",
         f"Scheme: {metrics['scheme']}",
         f"Hidden size: {metrics['hidden_size']}",
         f"Input size: {metrics['input_size']}",
-        f"Output size: {metrics['output_size']}",
-        f"Activation: {metrics['activation']}",
-        f"Learning rate: {metrics['learning_rate']}",
-        f"Batch size: {metrics['batch_size']}",
-        f"Epochs ran: {metrics['epochs_ran']}",
-        f"Final train loss: {metrics['final_train_loss']}",
-        f"Final val loss: {metrics['final_val_loss']}",
-        f"Best val loss: {metrics['best_val_loss']}",
+        f"Kept species: {metrics['kept_species']}",
+        f"Removed species: {metrics['removed_species']}",
         f"Test MSE: {metrics['test_mse']}",
+        f"Test MSE (unscaled): {metrics['test_mse_unscaled']}",
         f"Training time (s): {metrics['training_time_s']}",
     ]
 
@@ -499,21 +524,29 @@ def save_metrics_files(arch_dir, metrics):
         f.write("\n".join(lines))
 
 
-def save_predictions_csv(arch_dir, targets, outputs):
-    data = {}
-    n_outputs = targets.shape[1]
+def save_predictions_csv(arch_dir, targets_scaled, outputs_scaled, targets_unscaled, outputs_unscaled):
+    data = {"sample_id": np.arange(len(targets_scaled))}
+    n_outputs = targets_scaled.shape[1]
 
     for i in range(n_outputs):
-        denominator = outputs[:, i].copy()
-        denominator[np.abs(denominator) < 1e-9] = 1e-9
-        rel_err = np.abs((outputs[:, i] - targets[:, i]) / denominator)
+        denominator = outputs_unscaled[:, i].copy()
+        denominator[np.abs(denominator) < 1e-30] = 1e-30
 
-        data[f"k{i+1}_true"] = targets[:, i]
-        data[f"k{i+1}_pred"] = outputs[:, i]
+        abs_err = np.abs(outputs_unscaled[:, i] - targets_unscaled[:, i])
+        sq_err = (outputs_unscaled[:, i] - targets_unscaled[:, i]) ** 2
+        rel_err = np.abs((outputs_unscaled[:, i] - targets_unscaled[:, i]) / denominator)
+
+        data[f"k{i+1}_true_scaled"] = targets_scaled[:, i]
+        data[f"k{i+1}_pred_scaled"] = outputs_scaled[:, i]
+
+        data[f"k{i+1}_true_unscaled"] = targets_unscaled[:, i]
+        data[f"k{i+1}_pred_unscaled"] = outputs_unscaled[:, i]
+
+        data[f"k{i+1}_abs_err"] = abs_err
+        data[f"k{i+1}_sq_err"] = sq_err
         data[f"k{i+1}_rel_err"] = rel_err
 
-    df = pd.DataFrame(data)
-    df.to_csv(os.path.join(arch_dir, "predictions.csv"), index=False)
+    pd.DataFrame(data).to_csv(os.path.join(arch_dir, "predictions.csv"), index=False)
 
 
 def save_global_summary(results_root, all_metrics):
@@ -523,10 +556,11 @@ def save_global_summary(results_root, all_metrics):
 
     for metrics in all_metrics:
         lines.append(f"Architecture: {metrics['hidden_size']}")
+        lines.append(f"  Input size: {metrics['input_size']}")
+        lines.append(f"  Kept species: {metrics['kept_species']}")
+        lines.append(f"  Removed species: {metrics['removed_species']}")
         lines.append(f"  Test MSE: {metrics['test_mse']}")
-        lines.append(f"  Best val loss: {metrics['best_val_loss']}")
-        lines.append(f"  Final train loss: {metrics['final_train_loss']}")
-        lines.append(f"  Final val loss: {metrics['final_val_loss']}")
+        lines.append(f"  Test MSE (unscaled): {metrics['test_mse_unscaled']}")
         lines.append(f"  Training time (s): {metrics['training_time_s']}")
         for i in range(metrics["output_size"]):
             lines.append(f"  Mean rel err k{i+1}: {metrics[f'mean_rel_error_k{i+1}']}")
@@ -536,6 +570,73 @@ def save_global_summary(results_root, all_metrics):
     with open(os.path.join(results_root, "summary.txt"), "w") as f:
         f.write("\n".join(lines))
 
+
+def build_feature_names(species_names, num_pressure_conditions):
+    return [
+        f"{species}_p{p+1}"
+        for p in range(num_pressure_conditions)
+        for species in species_names
+    ]
+
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def save_json(filepath, obj):
+    with open(filepath, "w") as f:
+        json.dump(obj, f, indent=4)
+
+
+def save_experiment_info(results_root, info):
+    save_json(os.path.join(results_root, "experiment_info.json"), info)
+
+
+def save_summary_csv(results_root, all_metrics):
+    df = pd.DataFrame(all_metrics)
+
+    if "hidden_size" in df.columns:
+        df["hidden_size"] = df["hidden_size"].apply(
+            lambda x: ", ".join(map(str, x)) if isinstance(x, list) else x
+        )
+
+    if "kept_species" in df.columns:
+        df["kept_species"] = df["kept_species"].apply(
+            lambda x: ", ".join(x) if isinstance(x, list) else x
+        )
+
+    if "removed_species" in df.columns:
+        df["removed_species"] = df["removed_species"].apply(
+            lambda x: ", ".join(x) if isinstance(x, list) else x
+        )
+
+    df.to_csv(os.path.join(results_root, "summary.csv"), index=False)
+
+
+def save_loss_history_csv(arch_dir, history):
+    df = pd.DataFrame({
+        "epoch": np.arange(1, len(history["train_loss"]) + 1),
+        "train_loss": history["train_loss"],
+        "val_loss": history["val_loss"],
+        "train_loss_smooth": moving_average(history["train_loss"], window=25),
+        "val_loss_smooth": moving_average(history["val_loss"], window=25),
+    })
+    df.to_csv(os.path.join(arch_dir, "loss_history.csv"), index=False)
+
+
+def save_model_info(arch_dir, model, hidden_size):
+    model_info = {
+        "hidden_size": list(hidden_size),
+        "depth": len(hidden_size),
+        "num_parameters": count_parameters(model),
+    }
+    save_json(os.path.join(arch_dir, "model_info.json"), model_info)
+
+
+def save_test_inputs_csv(results_root, x_test_unscaled, feature_names):
+    df = pd.DataFrame(x_test_unscaled, columns=feature_names)
+    df.insert(0, "sample_id", np.arange(len(df)))
+    df.to_csv(os.path.join(results_root, "test_inputs.csv"), index=False)
 
 
 if __name__ == "__main__":
@@ -559,26 +660,64 @@ if __name__ == "__main__":
                                                  react_idx=dictionary[scheme]['k_columns'], scaler_input=dataset_train.scaler_input, scaler_output=dataset_train.scaler_output)
     x_test, y_test = dataset_test.get_data()
 
+
+
+    # Columns with each species (to remove inputs)
+    species_map = {
+        "O2(X)": [0, 11],
+        "O2(a)": [1, 12],
+        "O2(b)": [2, 13],
+        "O2(Hz)": [3, 14],
+        "O2+(X)": [4, 15],
+        "O(3P)": [5, 16],
+        "O(1D)": [6, 17],
+        "O+(gnd)": [7, 18],
+        "O-(gnd)": [8, 19],
+        "O3(X)": [9, 20],
+        "O3(exc)": [10, 21],
+    }
+
+    # Inputs for degradation experiment
+    kept_species = ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"]
+    kept_cols = []
+    for p in range(num_pressure_conditions):
+        for species in kept_species:
+            kept_cols.append(species_map[species][p])
+
+
+    # Apply the selected species to the actual datasets used by the DataLoaders
+    dataset_train.x_data = dataset_train.x_data[:, kept_cols]
+    dataset_test.x_data = dataset_test.x_data[:, kept_cols]
+
+    dataset_train.x_data_unscaled = dataset_train.x_data_unscaled[:, kept_cols]
+    dataset_test.x_data_unscaled = dataset_test.x_data_unscaled[:, kept_cols]
+
+    # Refresh local tensors after slicing
+    x_train, y_train = dataset_train.get_data()
+    x_test, y_test = dataset_test.get_data()
+
+
+
     # Check the shape of the data
     print(f"Shape of x_data: {x_train.shape}") # (2000, 9)
     print(f"Shape of y_data: {y_train.shape}") # (2000, 3)
 
 
     # Define the network
-    input_size = int(nspecies*num_pressure_conditions)  # 11 densities per each pressure condition
+    input_size = x_train.shape[1]                       # number depending on input number
     output_size = len(dictionary[scheme]['k_columns'])  # 3 coefficients
     
 
+    experiment_name = f"{len(kept_species)}_species_" + "_".join(kept_species)
 
-
-    # Experiment Setup
-    experiment_name = "all_inputs"
+    activation = "tanh"
+    learning_rate = 0.0001
+    batch_size = 16
 
     architectures = [
         (30, 30),
         (50, 50),
         (30, 30, 30),
-        (30, 30, 30, 30),
     ]
 
     results_root = make_results_root(
@@ -592,9 +731,42 @@ if __name__ == "__main__":
 
     results = []
 
-    activation = "tanh"
-    learning_rate = 0.0001
-    batch_size = 16
+
+    all_species = list(species_map.keys())
+    removed_species = [sp for sp in all_species if sp not in kept_species]
+    num_species_total = len(all_species)
+    num_species_kept = len(kept_species)
+
+    run_timestamp = os.path.basename(results_root)
+    feature_names = build_feature_names(kept_species, num_pressure_conditions)
+
+    experiment_info = {
+        "scheme": scheme,
+        "experiment_name": experiment_name,
+        "run_timestamp": run_timestamp,
+        "train_file": src_file_train,
+        "test_file": src_file_test,
+        "num_pressure_conditions": num_pressure_conditions,
+        "num_species_total": num_species_total,
+        "num_species_kept": num_species_kept,
+        "species_all": all_species,
+        "kept_species": kept_species,
+        "removed_species": removed_species,
+        "k_columns": dictionary[scheme]["k_columns"],
+        "architectures_tested": [list(a) for a in architectures],
+        "activation": activation,
+        "learning_rate": 0.0001,
+        "batch_size": 16,
+        "patience": 100,
+        "max_epochs": 5000,
+        "split_seed": 43,
+        "shuffle_seed": 43,
+        "weight_seed": 43,
+    }
+    save_experiment_info(results_root, experiment_info)
+
+    x_test_unscaled, _ = dataset_test.get_unscaled_data()
+    save_test_inputs_csv(results_root, x_test_unscaled.numpy(), feature_names)
 
     for hidden_size in architectures:
         print(f"\n--- Testing architecture: {hidden_size} ---")
@@ -618,7 +790,17 @@ if __name__ == "__main__":
         end = time.time()
 
         test_data = DataLoader(dataset_test, batch_size=len(dataset_test))
+
         targets, outputs, mse = evaluate_model(model, test_data)
+
+        targets_scaled = targets.numpy()
+        outputs_scaled = outputs.numpy()
+
+        targets_unscaled = dataset_test.y_data_unscaled.numpy()
+        outputs_unscaled = dataset_test.scaler_output[0].inverse_transform(outputs_scaled) / 1e30
+
+        mse_unscaled = mean_squared_error(targets_unscaled, outputs_unscaled)
+        rmse_unscaled = np.sqrt(mse_unscaled)   
 
         # Save model
         torch.save(model.state_dict(), os.path.join(arch_dir, "model.pth"))
@@ -626,24 +808,38 @@ if __name__ == "__main__":
         # Compute metrics
         metrics = compute_metrics_dict(
             scheme=scheme,
+            experiment_name=experiment_name,
+            run_timestamp=run_timestamp,
             hidden_size=hidden_size,
             input_size=input_size,
             output_size=output_size,
             activation=activation,
             learning_rate=learning_rate,
             batch_size=batch_size,
+            num_pressure_conditions=num_pressure_conditions,
+            num_species_total=num_species_total,
+            num_species_kept=num_species_kept,
+            kept_species=kept_species,
+            removed_species=removed_species,
+            num_parameters=count_parameters(model),
             loss_history=loss_history,
             training_time=end - start,
             mse=mse,
-            targets=targets.numpy(),
-            outputs=outputs.numpy()
+            mse_unscaled=mse_unscaled,
+            rmse_unscaled=rmse_unscaled,
+            targets=targets_scaled,
+            outputs=outputs_scaled
         )
 
         # Save metrics in JSON and TXT
         save_metrics_files(arch_dir, metrics)
 
         # Save predictions
-        save_predictions_csv(arch_dir, targets.numpy(), outputs.numpy())
+        save_predictions_csv(arch_dir, targets_scaled=targets_scaled, outputs_scaled=outputs_scaled, targets_unscaled=targets_unscaled, outputs_unscaled=outputs_unscaled)
+        
+        # Save extra machine-readable files
+        save_loss_history_csv(arch_dir, loss_history)
+        save_model_info(arch_dir, model, hidden_size)
 
         # Save plots
         plot_results(targets.numpy(), outputs.numpy(), output_size, arch_dir)
@@ -656,3 +852,4 @@ if __name__ == "__main__":
         print(f"Test MSE: {mse}")
 
     save_global_summary(results_root, results)
+    save_summary_csv(results_root, results)
