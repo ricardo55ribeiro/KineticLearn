@@ -18,10 +18,17 @@ IGNORED_DIR_NAMES = {
     "Plots",
 }
 
+# Exact architecture folders to create inside Comparative_Analysis
+ARCHITECTURES = [
+    "30, 30",
+    "30, 30, 30",
+    "50, 50",
+]
+
 ARCH_COLORS = {
     "30, 30": "blue",
-    "50, 50": "red",
     "30, 30, 30": "green",
+    "50, 50": "red",
 }
 
 
@@ -67,7 +74,7 @@ def hidden_size_sort_key(hidden_size_tuple):
 
 
 def get_color_for_architecture(label):
-    return ARCH_COLORS.get(label, None)
+    return ARCH_COLORS.get(label, "black")
 
 
 def load_all_results():
@@ -138,11 +145,20 @@ def load_all_results():
         else:
             raise RuntimeError("Could not determine the number of kept species.")
 
+    all_df["num_species_kept"] = pd.to_numeric(all_df["num_species_kept"], errors="coerce")
+    all_df["num_species_kept"] = all_df["num_species_kept"].round().astype("Int64")
+
     rel_cols = [c for c in all_df.columns if c.startswith("mean_rel_error_k")]
     if rel_cols:
         all_df["mean_rel_error_avg"] = all_df[rel_cols].mean(axis=1)
 
     all_df = all_df.replace([np.inf, -np.inf], np.nan)
+
+    # Keep only the three architectures requested
+    all_df = all_df[all_df["hidden_size_label"].isin(ARCHITECTURES)].copy()
+
+    if all_df.empty:
+        raise RuntimeError("No rows found for the requested architectures.")
 
     return all_df
 
@@ -191,12 +207,24 @@ def compute_relative_deterioration(df):
     return merged
 
 
+def prepare_architecture_dirs():
+    ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
+
+    arch_dirs = {}
+    for arch in ARCHITECTURES:
+        arch_dir = ANALYSIS_DIR / arch
+        arch_dir.mkdir(parents=True, exist_ok=True)
+        arch_dirs[arch] = arch_dir
+
+    return arch_dirs
+
+
 def save_aggregated_table(df):
     out_csv = ANALYSIS_DIR / "aggregated_results.csv"
-    df.sort_values(["num_species_kept", "arch_sort_key"]).to_csv(out_csv, index=False)
+    df.sort_values(["hidden_size_label", "num_species_kept"]).to_csv(out_csv, index=False)
 
 
-def save_relative_deterioration_csv(df):
+def save_architecture_report_csv(arch_dir, df_arch):
     cols = [
         "experiment_folder",
         "run_timestamp",
@@ -215,18 +243,22 @@ def save_relative_deterioration_csv(df):
         "mean_rel_error_k1",
         "mean_rel_error_k2",
         "mean_rel_error_k3",
+        "max_rel_error_k1",
+        "max_rel_error_k2",
+        "max_rel_error_k3",
+        "training_time_s",
     ]
     for col in extra_cols:
-        if col in df.columns:
+        if col in df_arch.columns:
             cols.append(col)
 
-    out_df = df[cols].sort_values(["hidden_size_label", "num_species_kept"]).copy()
-    out_df.to_csv(ANALYSIS_DIR / "relative_deterioration_report.csv", index=False)
+    out_df = df_arch[cols].sort_values("num_species_kept").copy()
+    out_df.to_csv(arch_dir / "relative_deterioration_report.csv", index=False)
 
 
-def save_relative_deterioration_txt(df):
+def save_architecture_report_txt(arch_dir, arch_label, df_arch):
     lines = []
-    lines.append("Relative deterioration report")
+    lines.append(f"Architecture report: {arch_label}")
     lines.append("")
     lines.append("Definitions:")
     lines.append("  MSE ratio = MSE_current / MSE_baseline")
@@ -234,63 +266,40 @@ def save_relative_deterioration_txt(df):
     lines.append("  Absolute relative deterioration (%) = abs(relative deterioration)")
     lines.append(f"  Baseline = experiment folder starting with '{BASELINE_PREFIX}' (11 kept species)")
     lines.append("")
-    lines.append("Interpretation:")
-    lines.append("  MSE ratio = 1.0  -> same as baseline")
-    lines.append("  MSE ratio > 1.0  -> worse than baseline")
-    lines.append("  MSE ratio < 1.0  -> better than baseline")
-    lines.append("  Absolute relative deterioration removes the sign and keeps only the magnitude of the change")
-    lines.append("")
 
-    arch_info = (
-        df[["hidden_size_label", "arch_sort_key"]]
-        .drop_duplicates()
-        .sort_values("arch_sort_key")
-    )
-
-    for _, arch_row in arch_info.iterrows():
-        label = arch_row["hidden_size_label"]
-        group = df[df["hidden_size_label"] == label].sort_values("num_species_kept")
-
-        baseline_candidates = group[group["experiment_folder"].astype(str).str.startswith(BASELINE_PREFIX)]
-        if baseline_candidates.empty:
-            continue
-
+    baseline_candidates = df_arch[df_arch["experiment_folder"].astype(str).str.startswith(BASELINE_PREFIX)]
+    if not baseline_candidates.empty:
         baseline_row = baseline_candidates.iloc[0]
-
-        lines.append(f"Architecture: {label}")
-        lines.append(f"  Baseline experiment: {baseline_row['experiment_folder']}")
-        lines.append(f"  Baseline number of species: {int(baseline_row['baseline_num_species'])}")
-        lines.append(f"  Baseline test MSE: {baseline_row['baseline_test_mse']:.6e}")
+        lines.append(f"Baseline experiment: {baseline_row['experiment_folder']}")
+        lines.append(f"Baseline number of species: {int(baseline_row['baseline_num_species'])}")
+        lines.append(f"Baseline test MSE: {baseline_row['baseline_test_mse']:.6e}")
         lines.append("")
 
-        for _, row in group.iterrows():
-            ratio = row["mse_ratio_vs_baseline"]
-            signed_det = row["relative_deterioration_test_mse_pct"]
-            abs_det = row["absolute_relative_deterioration_test_mse_pct"]
+    for _, row in df_arch.sort_values("num_species_kept").iterrows():
+        ratio = row["mse_ratio_vs_baseline"]
+        signed_det = row["relative_deterioration_test_mse_pct"]
+        abs_det = row["absolute_relative_deterioration_test_mse_pct"]
 
-            ratio_str = "nan" if pd.isna(ratio) else f"{ratio:.4f}"
-            signed_det_str = "nan" if pd.isna(signed_det) else f"{signed_det:+.2f}%"
-            abs_det_str = "nan" if pd.isna(abs_det) else f"{abs_det:.2f}%"
+        ratio_str = "nan" if pd.isna(ratio) else f"{ratio:.4f}"
+        signed_det_str = "nan" if pd.isna(signed_det) else f"{signed_det:+.2f}%"
+        abs_det_str = "nan" if pd.isna(abs_det) else f"{abs_det:.2f}%"
 
-            lines.append(
-                f"  Species: {int(row['num_species_kept']):>2d} | "
-                f"Experiment: {row['experiment_folder']} | "
-                f"Test MSE: {row['test_mse']:.6e} | "
-                f"MSE ratio: {ratio_str} | "
-                f"Relative deterioration: {signed_det_str} | "
-                f"Absolute relative deterioration: {abs_det_str}"
-            )
+        lines.append(
+            f"Species: {int(row['num_species_kept']):>2d} | "
+            f"Experiment: {row['experiment_folder']} | "
+            f"Test MSE: {row['test_mse']:.6e} | "
+            f"MSE ratio: {ratio_str} | "
+            f"Relative deterioration: {signed_det_str} | "
+            f"Absolute relative deterioration: {abs_det_str}"
+        )
 
-        lines.append("")
-        lines.append("-" * 130)
-        lines.append("")
-
-    with open(ANALYSIS_DIR / "relative_deterioration_report.txt", "w") as f:
+    with open(arch_dir / "relative_deterioration_report.txt", "w") as f:
         f.write("\n".join(lines))
 
 
-def make_metric_plot(
-    df,
+def make_single_arch_plot(
+    df_arch,
+    arch_label,
     y_col,
     y_label,
     filename,
@@ -298,44 +307,29 @@ def make_metric_plot(
     yscale=None,
     min_species=None,
 ):
-    if y_col not in df.columns:
+    if y_col not in df_arch.columns:
         return
 
-    plot_df = df.copy()
+    plot_df = df_arch.copy()
     if min_species is not None:
         plot_df = plot_df[plot_df["num_species_kept"] >= min_species].copy()
 
     plot_df = plot_df.replace([np.inf, -np.inf], np.nan)
+    plot_df = plot_df.dropna(subset=["num_species_kept", y_col]).sort_values("num_species_kept")
 
     if plot_df.empty:
         return
 
+    color = get_color_for_architecture(arch_label)
+
     plt.figure(figsize=(8, 6))
-
-    arch_info = (
-        plot_df[["hidden_size_label", "arch_sort_key"]]
-        .drop_duplicates()
-        .sort_values("arch_sort_key")
+    plt.plot(
+        plot_df["num_species_kept"],
+        plot_df[y_col],
+        marker="o",
+        linewidth=1.8,
+        color=color,
     )
-
-    for _, arch_row in arch_info.iterrows():
-        label = arch_row["hidden_size_label"]
-        color = get_color_for_architecture(label)
-
-        group = plot_df[plot_df["hidden_size_label"] == label].copy()
-        group = group.dropna(subset=["num_species_kept", y_col]).sort_values("num_species_kept")
-
-        if group.empty:
-            continue
-
-        plt.plot(
-            group["num_species_kept"],
-            group[y_col],
-            marker="o",
-            linewidth=1.8,
-            label=label,
-            color=color,
-        )
 
     plt.xlabel("Number of Species")
     plt.ylabel(y_label)
@@ -347,119 +341,83 @@ def make_metric_plot(
         vals = plot_df[y_col].dropna()
         if not vals.empty and (vals > 0).all():
             plt.yscale("log")
-
     elif yscale == "symlog":
         plt.yscale("symlog", linthresh=1)
 
     xticks = sorted(plot_df["num_species_kept"].dropna().unique())
     plt.xticks(xticks)
     plt.grid(True, which="both", alpha=0.3)
-    plt.legend(title="Architecture")
     plt.tight_layout()
-    plt.savefig(ANALYSIS_DIR / filename, dpi=300)
+    plt.savefig(filename, dpi=300)
     plt.close()
 
 
-def make_best_architecture_scatter(df):
-    best_df = df.loc[df.groupby("num_species_kept")["test_mse"].idxmin()].copy()
-    best_df = best_df.sort_values("num_species_kept")
-
-    if best_df.empty:
-        return
-
-    plt.figure(figsize=(8, 6))
-
-    for _, row in best_df.iterrows():
-        color = get_color_for_architecture(row["hidden_size_label"])
-        plt.scatter(row["num_species_kept"], row["test_mse"], color=color)
-        plt.annotate(
-            row["hidden_size_label"],
-            (row["num_species_kept"], row["test_mse"]),
-            textcoords="offset points",
-            xytext=(5, 5),
-        )
-
-    plt.xlabel("Number of Species")
-    plt.ylabel("Best test MSE")
-    plt.yscale("log")
-    plt.xticks(sorted(best_df["num_species_kept"].dropna().unique()))
-    plt.grid(True, which="both", alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(ANALYSIS_DIR / "best_architecture_by_species.pdf", dpi=300)
-    plt.close()
-
-    best_df.to_csv(ANALYSIS_DIR / "best_architecture_by_species.csv", index=False)
-
-
-def main():
-    ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
-
-    df = load_all_results()
-    df = compute_relative_deterioration(df)
-
-    save_aggregated_table(df)
-    save_relative_deterioration_csv(df)
-    save_relative_deterioration_txt(df)
-
+def make_architecture_plots(arch_dir, arch_label, df_arch):
     # Main performance plot
-    make_metric_plot(
-        df=df,
+    make_single_arch_plot(
+        df_arch=df_arch,
+        arch_label=arch_label,
         y_col="test_mse",
         y_label="Test MSE",
-        filename="test_mse_vs_num_species.pdf",
-        title="NN degradation vs number of species",
+        filename=arch_dir / "test_mse_vs_num_species.pdf",
+        title=f"{arch_label} — Test MSE vs number of species",
         yscale="log",
     )
 
-    # Zoomed performance plot (remove the 2-species outlier)
-    make_metric_plot(
-        df=df,
+    # Zoomed performance plot
+    make_single_arch_plot(
+        df_arch=df_arch,
+        arch_label=arch_label,
         y_col="test_mse",
         y_label="Test MSE",
-        filename="test_mse_vs_num_species_zoom.pdf",
-        title="NN degradation vs number of species (zoomed: 4 to 11 species)",
+        filename=arch_dir / "test_mse_vs_num_species_zoom.pdf",
+        title=f"{arch_label} — Test MSE vs number of species (zoomed: 4 to 11 species)",
         yscale="log",
         min_species=4,
     )
 
     # Absolute relative deterioration plot
-    make_metric_plot(
-        df=df,
+    make_single_arch_plot(
+        df_arch=df_arch,
+        arch_label=arch_label,
         y_col="absolute_relative_deterioration_test_mse_pct",
         y_label="Absolute relative deterioration in test MSE (%)",
-        filename="absolute_relative_deterioration_vs_num_species.pdf",
-        title="Absolute relative deterioration vs number of species",
+        filename=arch_dir / "absolute_relative_deterioration_vs_num_species.pdf",
+        title=f"{arch_label} — Absolute relative deterioration vs number of species",
         yscale="symlog",
     )
 
     # Zoomed absolute relative deterioration plot
-    make_metric_plot(
-        df=df,
+    make_single_arch_plot(
+        df_arch=df_arch,
+        arch_label=arch_label,
         y_col="absolute_relative_deterioration_test_mse_pct",
         y_label="Absolute relative deterioration in test MSE (%)",
-        filename="absolute_relative_deterioration_vs_num_species_zoom.pdf",
-        title="Absolute relative deterioration vs number of species (zoomed: 4 to 11 species)",
+        filename=arch_dir / "absolute_relative_deterioration_vs_num_species_zoom.pdf",
+        title=f"{arch_label} — Absolute relative deterioration vs number of species (zoomed: 4 to 11 species)",
         yscale=None,
         min_species=4,
     )
 
     # Average mean relative error
-    if "mean_rel_error_avg" in df.columns:
-        make_metric_plot(
-            df=df,
+    if "mean_rel_error_avg" in df_arch.columns:
+        make_single_arch_plot(
+            df_arch=df_arch,
+            arch_label=arch_label,
             y_col="mean_rel_error_avg",
             y_label="Mean relative error (average over k's)",
-            filename="mean_relative_error_avg_vs_num_species.pdf",
-            title="NN relative-error degradation vs number of species",
+            filename=arch_dir / "mean_relative_error_avg_vs_num_species.pdf",
+            title=f"{arch_label} — Mean relative error vs number of species",
             yscale="log",
         )
 
-        make_metric_plot(
-            df=df,
+        make_single_arch_plot(
+            df_arch=df_arch,
+            arch_label=arch_label,
             y_col="mean_rel_error_avg",
             y_label="Mean relative error (average over k's)",
-            filename="mean_relative_error_avg_vs_num_species_zoom.pdf",
-            title="NN relative-error degradation vs number of species (zoomed: 4 to 11 species)",
+            filename=arch_dir / "mean_relative_error_avg_vs_num_species_zoom.pdf",
+            title=f"{arch_label} — Mean relative error vs number of species (zoomed: 4 to 11 species)",
             yscale="log",
             min_species=4,
         )
@@ -467,31 +425,51 @@ def main():
     # Per-k relative-error plots
     for k in [1, 2, 3]:
         col = f"mean_rel_error_k{k}"
-        if col in df.columns:
-            make_metric_plot(
-                df=df,
+        if col in df_arch.columns:
+            make_single_arch_plot(
+                df_arch=df_arch,
+                arch_label=arch_label,
                 y_col=col,
                 y_label=f"Mean relative error k{k}",
-                filename=f"mean_relative_error_k{k}_vs_num_species.pdf",
-                title=f"NN relative-error degradation for k{k}",
+                filename=arch_dir / f"mean_relative_error_k{k}_vs_num_species.pdf",
+                title=f"{arch_label} — Mean relative error k{k} vs number of species",
                 yscale="log",
             )
 
-            make_metric_plot(
-                df=df,
+            make_single_arch_plot(
+                df_arch=df_arch,
+                arch_label=arch_label,
                 y_col=col,
                 y_label=f"Mean relative error k{k}",
-                filename=f"mean_relative_error_k{k}_vs_num_species_zoom.pdf",
-                title=f"NN relative-error degradation for k{k} (zoomed: 4 to 11 species)",
+                filename=arch_dir / f"mean_relative_error_k{k}_vs_num_species_zoom.pdf",
+                title=f"{arch_label} — Mean relative error k{k} vs number of species (zoomed: 4 to 11 species)",
                 yscale="log",
                 min_species=4,
             )
 
-    make_best_architecture_scatter(df)
+
+def main():
+    df = load_all_results()
+    df = compute_relative_deterioration(df)
+
+    arch_dirs = prepare_architecture_dirs()
+    save_aggregated_table(df)
+
+    for arch_label in ARCHITECTURES:
+        df_arch = df[df["hidden_size_label"] == arch_label].copy()
+
+        if df_arch.empty:
+            print(f"Skipping architecture {arch_label}: no rows found.")
+            continue
+
+        arch_dir = arch_dirs[arch_label]
+
+        save_architecture_report_csv(arch_dir, df_arch)
+        save_architecture_report_txt(arch_dir, arch_label, df_arch)
+        make_architecture_plots(arch_dir, arch_label, df_arch)
 
     print(f"Analysis files saved to: {ANALYSIS_DIR}")
 
 
 if __name__ == "__main__":
     main()
-    

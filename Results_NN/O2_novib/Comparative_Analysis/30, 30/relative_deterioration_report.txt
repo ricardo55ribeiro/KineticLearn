@@ -1,0 +1,22 @@
+Architecture report: 30, 30
+
+Definitions:
+  MSE ratio = MSE_current / MSE_baseline
+  Relative deterioration (%) = 100 * (MSE_current - MSE_baseline) / MSE_baseline
+  Absolute relative deterioration (%) = abs(relative deterioration)
+  Baseline = experiment folder starting with '11__' (11 kept species)
+
+Baseline experiment: 11__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd)_O3(X)_O3(exc)
+Baseline number of species: 11
+Baseline test MSE: 1.626522e-06
+
+Species:  2 | Experiment: 2__O2(X)_O2(a) | Test MSE: 1.536026e-02 | MSE ratio: 9443.6260 | Relative deterioration: +944262.60% | Absolute relative deterioration: 944262.60%
+Species:  3 | Experiment: 3__O2(X)_O2(a)_O2(b) | Test MSE: 1.756336e-06 | MSE ratio: 1.0798 | Relative deterioration: +7.98% | Absolute relative deterioration: 7.98%
+Species:  4 | Experiment: 4__O2(X)_O2(a)_O2(b)_O2(Hz) | Test MSE: 2.061754e-06 | MSE ratio: 1.2676 | Relative deterioration: +26.76% | Absolute relative deterioration: 26.76%
+Species:  5 | Experiment: 5__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X) | Test MSE: 2.920543e-06 | MSE ratio: 1.7956 | Relative deterioration: +79.56% | Absolute relative deterioration: 79.56%
+Species:  6 | Experiment: 6__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P) | Test MSE: 5.811209e-06 | MSE ratio: 3.5728 | Relative deterioration: +257.28% | Absolute relative deterioration: 257.28%
+Species:  7 | Experiment: 7__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D) | Test MSE: 5.120197e-06 | MSE ratio: 3.1479 | Relative deterioration: +214.79% | Absolute relative deterioration: 214.79%
+Species:  8 | Experiment: 8__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd) | Test MSE: 6.014676e-06 | MSE ratio: 3.6979 | Relative deterioration: +269.79% | Absolute relative deterioration: 269.79%
+Species:  9 | Experiment: 9__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd) | Test MSE: 3.172739e-06 | MSE ratio: 1.9506 | Relative deterioration: +95.06% | Absolute relative deterioration: 95.06%
+Species: 10 | Experiment: 10__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd)_O3(X) | Test MSE: 8.447115e-06 | MSE ratio: 5.1934 | Relative deterioration: +419.34% | Absolute relative deterioration: 419.34%
+Species: 11 | Experiment: 11__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd)_O3(X)_O3(exc) | Test MSE: 1.626522e-06 | MSE ratio: 1.0000 | Relative deterioration: +0.00% | Absolute relative deterioration: 0.00%

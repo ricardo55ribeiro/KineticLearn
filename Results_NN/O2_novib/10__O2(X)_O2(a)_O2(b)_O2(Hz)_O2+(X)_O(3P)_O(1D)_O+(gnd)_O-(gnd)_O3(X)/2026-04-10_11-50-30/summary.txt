@@ -1,0 +1,43 @@
+Architecture comparison summary
+
+Architecture: [30, 30]
+  Input size: 20
+  Kept species: ['O2(X)', 'O2(a)', 'O2(b)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O(1D)', 'O+(gnd)', 'O-(gnd)', 'O3(X)']
+  Removed species: ['O3(exc)']
+  Test MSE: 8.447114851151127e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Training time (s): 173.06698393821716
+  Mean rel err k1: 0.00754734268411994
+  Max rel err k1: 0.04089250788092613
+  Mean rel err k2: 0.001834237715229392
+  Max rel err k2: 0.006799451075494289
+  Mean rel err k3: 0.0011042918777093291
+  Max rel err k3: 0.0038760763127356768
+
+Architecture: [50, 50]
+  Input size: 20
+  Kept species: ['O2(X)', 'O2(a)', 'O2(b)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O(1D)', 'O+(gnd)', 'O-(gnd)', 'O3(X)']
+  Removed species: ['O3(exc)']
+  Test MSE: 3.591597305785399e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Training time (s): 194.12411642074585
+  Mean rel err k1: 0.004581144545227289
+  Max rel err k1: 0.02541806735098362
+  Mean rel err k2: 0.0013972293818369508
+  Max rel err k2: 0.006521463859826326
+  Mean rel err k3: 0.0010636202059686184
+  Max rel err k3: 0.0049198828637599945
+
+Architecture: [30, 30, 30]
+  Input size: 20
+  Kept species: ['O2(X)', 'O2(a)', 'O2(b)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O(1D)', 'O+(gnd)', 'O-(gnd)', 'O3(X)']
+  Removed species: ['O3(exc)']
+  Test MSE: 2.7876019430550514e-06
+  Test MSE (unscaled): 5.605193857299268e-45
+  Training time (s): 175.07206344604492
+  Mean rel err k1: 0.0028037619777023792
+  Max rel err k1: 0.011910391971468925
+  Mean rel err k2: 0.0016627047443762422
+  Max rel err k2: 0.0060958354733884335
+  Mean rel err k3: 0.002485410077497363
+  Max rel err k3: 0.009000803343951702

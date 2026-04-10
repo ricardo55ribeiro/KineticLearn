@@ -1,0 +1,66 @@
+{
+    "scheme": "O2_novib",
+    "experiment_name": "8__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)",
+    "run_timestamp": "2026-04-10_12-00-54",
+    "train_file": "data\\datapoints_O2_novib_mainNet_2surrog.txt",
+    "test_file": "data\\datapoints_O2_novib_mainNet_2surrog_test.txt",
+    "num_pressure_conditions": 2,
+    "num_species_total": 11,
+    "num_species_kept": 8,
+    "species_all": [
+        "O2(X)",
+        "O2(a)",
+        "O2(b)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(X)",
+        "O3(exc)"
+    ],
+    "kept_species": [
+        "O2(X)",
+        "O2(a)",
+        "O2(b)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)"
+    ],
+    "removed_species": [
+        "O-(gnd)",
+        "O3(X)",
+        "O3(exc)"
+    ],
+    "k_columns": [
+        0,
+        1,
+        2
+    ],
+    "architectures_tested": [
+        [
+            30,
+            30
+        ],
+        [
+            50,
+            50
+        ],
+        [
+            30,
+            30,
+            30
+        ]
+    ],
+    "activation": "tanh",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "patience": 100,
+    "max_epochs": 5000,
+    "split_seed": 43,
+    "shuffle_seed": 43,
+    "weight_seed": 43
+}
