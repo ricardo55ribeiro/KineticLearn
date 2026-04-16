@@ -636,7 +636,6 @@ def save_test_inputs_csv(results_root, x_test_unscaled, feature_names):
 
 
 if __name__ == "__main__":
-    torch.manual_seed(8) # for reproducibility
 
     # Select scheme
     scheme = 'O2_novib'
@@ -655,6 +654,23 @@ if __name__ == "__main__":
     dataset_test = LoadMultiPressureDatasetTorch(src_file_test, nspecies, num_pressure_conditions, 
                                                  react_idx=dictionary[scheme]['k_columns'], scaler_input=dataset_train.scaler_input, scaler_output=dataset_train.scaler_output)
     x_test, y_test = dataset_test.get_data()
+
+
+    # Check dataset sizes
+    """
+    val_split = 0.1
+    train_total = len(dataset_train)
+    test_total = len(dataset_test)
+    train_len = int((1.0 - val_split) * train_total)
+    val_len = train_total - train_len
+
+    print(f"Train+Valid total: {train_total}")
+    print(f"Train: {train_len}")
+    print(f"Valid: {val_len}")
+    print(f"Test: {test_total}")
+
+    exit(0)
+    """
 
 
 

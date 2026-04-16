@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+ZOOM_MIN = 3
+
 SCHEME = "O2_novib"
 SCHEME_ROOT = Path("Results_NN") / SCHEME
 ANALYSIS_DIR = SCHEME_ROOT / "Comparative_Analysis"
@@ -199,10 +201,6 @@ def compute_relative_deterioration(df):
         / merged["baseline_test_mse"]
     )
 
-    merged["absolute_relative_deterioration_test_mse_pct"] = (
-        merged["relative_deterioration_test_mse_pct"].abs()
-    )
-
     merged = merged.replace([np.inf, -np.inf], np.nan)
     return merged
 
@@ -235,7 +233,6 @@ def save_architecture_report_csv(arch_dir, df_arch):
         "baseline_test_mse",
         "mse_ratio_vs_baseline",
         "relative_deterioration_test_mse_pct",
-        "absolute_relative_deterioration_test_mse_pct",
     ]
 
     extra_cols = [
@@ -263,7 +260,6 @@ def save_architecture_report_txt(arch_dir, arch_label, df_arch):
     lines.append("Definitions:")
     lines.append("  MSE ratio = MSE_current / MSE_baseline")
     lines.append("  Relative deterioration (%) = 100 * (MSE_current - MSE_baseline) / MSE_baseline")
-    lines.append("  Absolute relative deterioration (%) = abs(relative deterioration)")
     lines.append(f"  Baseline = experiment folder starting with '{BASELINE_PREFIX}' (11 kept species)")
     lines.append("")
 
@@ -278,19 +274,16 @@ def save_architecture_report_txt(arch_dir, arch_label, df_arch):
     for _, row in df_arch.sort_values("num_species_kept").iterrows():
         ratio = row["mse_ratio_vs_baseline"]
         signed_det = row["relative_deterioration_test_mse_pct"]
-        abs_det = row["absolute_relative_deterioration_test_mse_pct"]
 
         ratio_str = "nan" if pd.isna(ratio) else f"{ratio:.4f}"
         signed_det_str = "nan" if pd.isna(signed_det) else f"{signed_det:+.2f}%"
-        abs_det_str = "nan" if pd.isna(abs_det) else f"{abs_det:.2f}%"
 
         lines.append(
             f"Species: {int(row['num_species_kept']):>2d} | "
             f"Experiment: {row['experiment_folder']} | "
             f"Test MSE: {row['test_mse']:.6e} | "
             f"MSE ratio: {ratio_str} | "
-            f"Relative deterioration: {signed_det_str} | "
-            f"Absolute relative deterioration: {abs_det_str}"
+            f"Relative deterioration: {signed_det_str}"
         )
 
     with open(arch_dir / "relative_deterioration_report.txt", "w") as f:
@@ -360,7 +353,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
         y_col="test_mse",
         y_label="Test MSE",
         filename=arch_dir / "test_mse_vs_num_species.pdf",
-        title=f"{arch_label} — Test MSE vs number of species",
+        title=f"{arch_label} — Test MSE vs number of species (zoomed: {ZOOM_MIN} to 11 species)",
         yscale="log",
     )
 
@@ -373,30 +366,30 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
         filename=arch_dir / "test_mse_vs_num_species_zoom.pdf",
         title=f"{arch_label} — Test MSE vs number of species (zoomed: 4 to 11 species)",
         yscale="log",
-        min_species=4,
+        min_species=ZOOM_MIN,
     )
 
-    # Absolute relative deterioration plot
+    # Relative deterioration plot
     make_single_arch_plot(
         df_arch=df_arch,
         arch_label=arch_label,
-        y_col="absolute_relative_deterioration_test_mse_pct",
-        y_label="Absolute relative deterioration in test MSE (%)",
-        filename=arch_dir / "absolute_relative_deterioration_vs_num_species.pdf",
-        title=f"{arch_label} — Absolute relative deterioration vs number of species",
+        y_col="relative_deterioration_test_mse_pct",
+        y_label="Relative deterioration in test MSE (%)",
+        filename=arch_dir / "relative_deterioration_vs_num_species.pdf",
+        title=f"{arch_label} — Relative deterioration vs number of species (zoomed: {ZOOM_MIN} to 11 species)",
         yscale="symlog",
     )
 
-    # Zoomed absolute relative deterioration plot
+    # Zoomed relative deterioration plot
     make_single_arch_plot(
         df_arch=df_arch,
         arch_label=arch_label,
-        y_col="absolute_relative_deterioration_test_mse_pct",
-        y_label="Absolute relative deterioration in test MSE (%)",
-        filename=arch_dir / "absolute_relative_deterioration_vs_num_species_zoom.pdf",
-        title=f"{arch_label} — Absolute relative deterioration vs number of species (zoomed: 4 to 11 species)",
+        y_col="relative_deterioration_test_mse_pct",
+        y_label="Relative deterioration in test MSE (%)",
+        filename=arch_dir / "relative_deterioration_vs_num_species_zoom.pdf",
+        title=f"{arch_label} — Relative deterioration vs number of species (zoomed: 4 to 11 species)",
         yscale=None,
-        min_species=4,
+        min_species=ZOOM_MIN,
     )
 
     # Average mean relative error
@@ -407,7 +400,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
             y_col="mean_rel_error_avg",
             y_label="Mean relative error (average over k's)",
             filename=arch_dir / "mean_relative_error_avg_vs_num_species.pdf",
-            title=f"{arch_label} — Mean relative error vs number of species",
+            title=f"{arch_label} — Mean relative error vs number of species (zoomed: {ZOOM_MIN} to 11 species)",
             yscale="log",
         )
 
@@ -419,7 +412,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
             filename=arch_dir / "mean_relative_error_avg_vs_num_species_zoom.pdf",
             title=f"{arch_label} — Mean relative error vs number of species (zoomed: 4 to 11 species)",
             yscale="log",
-            min_species=4,
+            min_species=ZOOM_MIN,
         )
 
     # Per-k relative-error plots
@@ -432,7 +425,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
                 y_col=col,
                 y_label=f"Mean relative error k{k}",
                 filename=arch_dir / f"mean_relative_error_k{k}_vs_num_species.pdf",
-                title=f"{arch_label} — Mean relative error k{k} vs number of species",
+                title=f"{arch_label} — Mean relative error k{k} vs number of species (zoomed: {ZOOM_MIN} to 11 species)",
                 yscale="log",
             )
 
@@ -444,7 +437,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
                 filename=arch_dir / f"mean_relative_error_k{k}_vs_num_species_zoom.pdf",
                 title=f"{arch_label} — Mean relative error k{k} vs number of species (zoomed: 4 to 11 species)",
                 yscale="log",
-                min_species=4,
+                min_species=ZOOM_MIN,
             )
 
 

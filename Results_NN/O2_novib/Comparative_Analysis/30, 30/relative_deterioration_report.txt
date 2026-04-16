@@ -10,7 +10,6 @@ Baseline experiment: 11__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(
 Baseline number of species: 11
 Baseline test MSE: 1.626522e-06
 
-Species:  2 | Experiment: 2__O2(X)_O2(a) | Test MSE: 1.536026e-02 | MSE ratio: 9443.6260 | Relative deterioration: +944262.60% | Absolute relative deterioration: 944262.60%
 Species:  3 | Experiment: 3__O2(X)_O2(a)_O2(b) | Test MSE: 1.756336e-06 | MSE ratio: 1.0798 | Relative deterioration: +7.98% | Absolute relative deterioration: 7.98%
 Species:  4 | Experiment: 4__O2(X)_O2(a)_O2(b)_O2(Hz) | Test MSE: 2.061754e-06 | MSE ratio: 1.2676 | Relative deterioration: +26.76% | Absolute relative deterioration: 26.76%
 Species:  5 | Experiment: 5__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X) | Test MSE: 2.920543e-06 | MSE ratio: 1.7956 | Relative deterioration: +79.56% | Absolute relative deterioration: 79.56%
