@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Sequence
+from typing import Any, Dict, List, Sequence
 
 import numpy as np
 import torch
@@ -26,7 +26,6 @@ class MaskingConfig:
 class SpeciesMaskGenerator:
     """
     Generates species-level masks and expands them across all pressure blocks.
-
     The same species mask is repeated for every pressure condition.
     """
 
@@ -50,13 +49,19 @@ class SpeciesMaskGenerator:
                     self.config.max_observed_species + 1,
                 )
             )
+
         observed_species_count = int(observed_species_count)
         if not (0 <= observed_species_count <= self.config.num_species):
             raise ValueError(
-                f"observed_species_count={observed_species_count} is outside the valid range [0, {self.config.num_species}]"
+                f"observed_species_count={observed_species_count} is outside the valid range "
+                f"[0, {self.config.num_species}]"
             )
 
-        observed_indices = self.rng.choice(self.config.num_species, size=observed_species_count, replace=False)
+        observed_indices = self.rng.choice(
+            self.config.num_species,
+            size=observed_species_count,
+            replace=False,
+        )
         species_mask = np.zeros(self.config.num_species, dtype=np.float32)
         species_mask[observed_indices] = 1.0
         return species_mask
@@ -65,14 +70,31 @@ class SpeciesMaskGenerator:
         species_mask = self.sample_species_mask(observed_species_count=observed_species_count)
         return species_mask_to_feature_mask(species_mask, self.config.num_pressure_conditions)
 
-    def sample_batch_feature_masks(self, batch_size: int, observed_species_count: int | None = None) -> np.ndarray:
-        masks = [self.sample_feature_mask(observed_species_count=observed_species_count) for _ in range(batch_size)]
+    def sample_batch_feature_masks(
+        self,
+        batch_size: int,
+        observed_species_count: int | None = None,
+    ) -> np.ndarray:
+        masks = [
+            self.sample_feature_mask(observed_species_count=observed_species_count)
+            for _ in range(batch_size)
+        ]
         return np.stack(masks, axis=0).astype(np.float32)
 
 
 def concat_masked_inputs(x_scaled: torch.Tensor, feature_mask: torch.Tensor) -> torch.Tensor:
     masked_x = x_scaled * feature_mask
     return torch.cat([masked_x, feature_mask], dim=1)
+
+
+def relative_error_against_prediction(
+    true_values: np.ndarray,
+    predicted_values: np.ndarray,
+    epsilon: float,
+) -> np.ndarray:
+    denominator = predicted_values.copy()
+    denominator[np.abs(denominator) < epsilon] = epsilon
+    return np.abs((predicted_values - true_values) / denominator)
 
 
 @dataclass
@@ -85,15 +107,10 @@ class TrainingArtifacts:
 
 @dataclass
 class EvaluationArtifacts:
-    regime_name: str
+    observed_species_count: int
     repeats: int
     sampled_species_subsets: List[List[str]]
-    observed_species_counts: List[int]
-    predictions_scaled_repeats: np.ndarray  # [repeats, samples, outputs]
-    predictions_scaled_mean: np.ndarray     # [samples, outputs]
-    predictions_scaled_std: np.ndarray      # [samples, outputs]
-    predictions_unscaled_mean: np.ndarray   # [samples, outputs]
-    predictions_unscaled_std: np.ndarray    # [samples, outputs]
+    per_repeat_metrics: Dict[str, List[float]]
     metrics: Dict[str, Any]
 
 
@@ -112,17 +129,6 @@ class FixedMaskValidationDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx: int):
         x_scaled, y_scaled = self.base_subset[idx]
         return x_scaled, y_scaled, self.full_feature_masks[idx]
-
-
-class IdentityMaskedDataset(torch.utils.data.Dataset):
-    def __init__(self, base_dataset: torch.utils.data.Dataset):
-        self.base_dataset = base_dataset
-
-    def __len__(self) -> int:
-        return len(self.base_dataset)
-
-    def __getitem__(self, idx: int):
-        return self.base_dataset[idx]
 
 
 def train_masked_model(
@@ -149,7 +155,6 @@ def train_masked_model(
     split_generator = torch.Generator().manual_seed(split_seed)
     train_subset, val_subset = random_split(dataset_train, [train_len, val_len], generator=split_generator)
 
-    # Fixed validation masks for stable early stopping.
     val_mask_generator = SpeciesMaskGenerator(
         MaskingConfig(
             num_species=masking_config.num_species,
@@ -183,7 +188,7 @@ def train_masked_model(
 
     model.to(device)
 
-    for _epoch in range(max_epochs):
+    for epoch_idx in range(max_epochs):
         model.train()
         train_loss_accumulator = 0.0
 
@@ -191,7 +196,9 @@ def train_masked_model(
             x_scaled = x_scaled.to(device)
             y_scaled = y_scaled.to(device)
 
-            batch_feature_masks_np = training_mask_generator.sample_batch_feature_masks(batch_size=x_scaled.shape[0])
+            batch_feature_masks_np = training_mask_generator.sample_batch_feature_masks(
+                batch_size=x_scaled.shape[0]
+            )
             batch_feature_masks = torch.from_numpy(batch_feature_masks_np).float().to(device)
             model_inputs = concat_masked_inputs(x_scaled, batch_feature_masks)
 
@@ -210,6 +217,7 @@ def train_masked_model(
                 x_scaled = x_scaled.to(device)
                 y_scaled = y_scaled.to(device)
                 fixed_feature_mask = fixed_feature_mask.to(device)
+
                 model_inputs = concat_masked_inputs(x_scaled, fixed_feature_mask)
                 predictions = model(model_inputs)
                 loss = criterion(predictions, y_scaled)
@@ -229,6 +237,7 @@ def train_masked_model(
             epochs_without_improvement += 1
             if epochs_without_improvement >= patience:
                 break
+
 
     model.load_state_dict(best_model_state)
     return TrainingArtifacts(
@@ -262,50 +271,106 @@ def _predict_with_fixed_feature_mask(
     return np.concatenate(predictions, axis=0)
 
 
-def evaluate_regime(
+def _compute_per_repeat_metrics(
+    y_scaled_np: np.ndarray,
+    y_unscaled_np: np.ndarray,
+    predictions_scaled_repeats_np: np.ndarray,
+    predictions_unscaled_repeats_np: np.ndarray,
+) -> Dict[str, List[float]]:
+    n_outputs = y_scaled_np.shape[1]
+
+    metric_arrays: Dict[str, List[float]] = {
+        "test_mse": [],
+        "test_rmse": [],
+        "test_mse_unscaled": [],
+        "test_rmse_unscaled": [],
+        "mean_rel_error_avg": [],
+    }
+    for output_idx in range(n_outputs):
+        metric_arrays[f"mean_rel_error_k{output_idx + 1}"] = []
+
+    for pred_scaled, pred_unscaled in zip(predictions_scaled_repeats_np, predictions_unscaled_repeats_np):
+        mse_scaled = float(mean_squared_error(y_scaled_np, pred_scaled))
+        mse_unscaled = float(mean_squared_error(y_unscaled_np, pred_unscaled))
+
+        metric_arrays["test_mse"].append(mse_scaled)
+        metric_arrays["test_rmse"].append(float(np.sqrt(mse_scaled)))
+        metric_arrays["test_mse_unscaled"].append(mse_unscaled)
+        metric_arrays["test_rmse_unscaled"].append(float(np.sqrt(mse_unscaled)))
+
+        rel_err_scaled = relative_error_against_prediction(
+            true_values=y_scaled_np,
+            predicted_values=pred_scaled,
+            epsilon=1e-9,
+        )
+        metric_arrays["mean_rel_error_avg"].append(float(rel_err_scaled.mean()))
+
+        for output_idx in range(n_outputs):
+            metric_arrays[f"mean_rel_error_k{output_idx + 1}"].append(
+                float(rel_err_scaled[:, output_idx].mean())
+            )
+
+    return metric_arrays
+
+
+def _summarize_per_repeat_metrics(
+    observed_species_count: int,
+    repeats: int,
+    per_repeat_metrics: Dict[str, List[float]],
+) -> Dict[str, Any]:
+    summary: Dict[str, Any] = {
+        "observed_species_count": int(observed_species_count),
+        "repeats": int(repeats),
+    }
+
+    for metric_name, values in per_repeat_metrics.items():
+        arr = np.asarray(values, dtype=float)
+        summary[metric_name] = float(arr.mean())
+        summary[f"{metric_name}_within_subset_std"] = float(arr.std(ddof=0))
+
+    return summary
+
+
+def evaluate_observed_species_count(
     model: torch.nn.Module,
     x_scaled: torch.Tensor,
     y_scaled: torch.Tensor,
     inverse_transform_targets,
-    regime_name: str,
-    regime_mode: str,
+    observed_species_count: int,
     species_names: Sequence[str],
     num_pressure_conditions: int,
-    min_observed_species_train: int,
     repeats: int,
     seed: int,
     device: str,
-    exact_species_count: int | None = None,
 ) -> EvaluationArtifacts:
     num_species = len(species_names)
+    if not (0 <= observed_species_count <= num_species):
+        raise ValueError(
+            f"observed_species_count={observed_species_count} must be between 0 and {num_species}."
+        )
+
     mask_generator = SpeciesMaskGenerator(
         MaskingConfig(
             num_species=num_species,
             num_pressure_conditions=num_pressure_conditions,
-            min_observed_species=min_observed_species_train,
-            max_observed_species=num_species,
+            min_observed_species=observed_species_count,
+            max_observed_species=observed_species_count,
             seed=seed,
         )
     )
 
-    if regime_mode == "all":
-        sampled_feature_masks = [np.ones(num_species * num_pressure_conditions, dtype=np.float32)]
-        sampled_species_masks = [np.ones(num_species, dtype=np.float32)]
-        repeats = 1
-    elif regime_mode == "exact":
-        if exact_species_count is None:
-            raise ValueError("exact_species_count must be provided for regime_mode='exact'")
-        sampled_species_masks = [mask_generator.sample_species_mask(observed_species_count=exact_species_count) for _ in range(repeats)]
-        sampled_feature_masks = [species_mask_to_feature_mask(mask, num_pressure_conditions) for mask in sampled_species_masks]
-    elif regime_mode == "uniform_range":
-        sampled_species_masks = [mask_generator.sample_species_mask(observed_species_count=None) for _ in range(repeats)]
-        sampled_feature_masks = [species_mask_to_feature_mask(mask, num_pressure_conditions) for mask in sampled_species_masks]
-    else:
-        raise ValueError(f"Unsupported regime_mode '{regime_mode}'")
+    sampled_species_masks = [
+        mask_generator.sample_species_mask(observed_species_count=observed_species_count)
+        for _ in range(repeats)
+    ]
+    sampled_feature_masks = [
+        species_mask_to_feature_mask(mask, num_pressure_conditions)
+        for mask in sampled_species_masks
+    ]
 
     predictions_scaled_repeats = []
     sampled_species_subsets: list[list[str]] = []
-    observed_species_counts: list[int] = []
+
     for feature_mask, species_mask in zip(sampled_feature_masks, sampled_species_masks):
         predictions_scaled = _predict_with_fixed_feature_mask(
             model=model,
@@ -314,54 +379,36 @@ def evaluate_regime(
             device=device,
         )
         predictions_scaled_repeats.append(predictions_scaled)
+
         observed_indices = np.flatnonzero(species_mask > 0.5)
         sampled_species_subsets.append([species_names[idx] for idx in observed_indices])
-        observed_species_counts.append(int(len(observed_indices)))
 
     predictions_scaled_repeats_np = np.stack(predictions_scaled_repeats, axis=0)
-    predictions_scaled_mean = predictions_scaled_repeats_np.mean(axis=0)
-    predictions_scaled_std = predictions_scaled_repeats_np.std(axis=0, ddof=0)
 
+    y_scaled_np = y_scaled.numpy()
+    y_unscaled_np = inverse_transform_targets(y_scaled_np)
     predictions_unscaled_repeats_np = np.stack(
         [inverse_transform_targets(pred) for pred in predictions_scaled_repeats_np],
         axis=0,
     )
-    predictions_unscaled_mean = predictions_unscaled_repeats_np.mean(axis=0)
-    predictions_unscaled_std = predictions_unscaled_repeats_np.std(axis=0, ddof=0)
 
-    y_scaled_np = y_scaled.numpy()
-    y_unscaled_np = inverse_transform_targets(y_scaled_np)
+    per_repeat_metrics = _compute_per_repeat_metrics(
+        y_scaled_np=y_scaled_np,
+        y_unscaled_np=y_unscaled_np,
+        predictions_scaled_repeats_np=predictions_scaled_repeats_np,
+        predictions_unscaled_repeats_np=predictions_unscaled_repeats_np,
+    )
 
-    mse_scaled_per_repeat = [mean_squared_error(y_scaled_np, pred) for pred in predictions_scaled_repeats_np]
-    mse_unscaled_per_repeat = [mean_squared_error(y_unscaled_np, pred) for pred in predictions_unscaled_repeats_np]
-
-    metrics: Dict[str, Any] = {
-        "regime_name": regime_name,
-        "regime_mode": regime_mode,
-        "repeats": repeats,
-        "observed_species_count_mean": float(np.mean(observed_species_counts)),
-        "observed_species_count_std": float(np.std(observed_species_counts, ddof=0)),
-        "mse_scaled_mean_over_repeats": float(np.mean(mse_scaled_per_repeat)),
-        "mse_scaled_std_over_repeats": float(np.std(mse_scaled_per_repeat, ddof=0)),
-        "rmse_scaled_mean_over_repeats": float(np.sqrt(np.mean(mse_scaled_per_repeat))),
-        "mse_unscaled_mean_over_repeats": float(np.mean(mse_unscaled_per_repeat)),
-        "mse_unscaled_std_over_repeats": float(np.std(mse_unscaled_per_repeat, ddof=0)),
-        "rmse_unscaled_mean_over_repeats": float(np.sqrt(np.mean(mse_unscaled_per_repeat))),
-        "mse_scaled_of_mean_prediction": float(mean_squared_error(y_scaled_np, predictions_scaled_mean)),
-        "mse_unscaled_of_mean_prediction": float(mean_squared_error(y_unscaled_np, predictions_unscaled_mean)),
-    }
-    metrics["rmse_scaled_of_mean_prediction"] = float(np.sqrt(metrics["mse_scaled_of_mean_prediction"]))
-    metrics["rmse_unscaled_of_mean_prediction"] = float(np.sqrt(metrics["mse_unscaled_of_mean_prediction"]))
+    metrics = _summarize_per_repeat_metrics(
+        observed_species_count=observed_species_count,
+        repeats=repeats,
+        per_repeat_metrics=per_repeat_metrics,
+    )
 
     return EvaluationArtifacts(
-        regime_name=regime_name,
-        repeats=repeats,
+        observed_species_count=int(observed_species_count),
+        repeats=int(repeats),
         sampled_species_subsets=sampled_species_subsets,
-        observed_species_counts=observed_species_counts,
-        predictions_scaled_repeats=predictions_scaled_repeats_np,
-        predictions_scaled_mean=predictions_scaled_mean,
-        predictions_scaled_std=predictions_scaled_std,
-        predictions_unscaled_mean=predictions_unscaled_mean,
-        predictions_unscaled_std=predictions_unscaled_std,
+        per_repeat_metrics=per_repeat_metrics,
         metrics=metrics,
     )

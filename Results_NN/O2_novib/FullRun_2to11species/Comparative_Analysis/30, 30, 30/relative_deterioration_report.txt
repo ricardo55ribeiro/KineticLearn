@@ -11,7 +11,7 @@ Baseline number of species: 11
 Baseline test MSE: 1.955561e-06 ± 1.434450e-06
 
 Species:  2 | Experiment: 2__O2(X)_O2(a) | Source: seed_aggregate | Test MSE: 1.525142e-02 ± 3.914907e-04 | MSE ratio: 7799.0015 ± 5724.2549 | Relative deterioration: +779800.15% ± 572425.49%
-Species:  3 | Experiment: 3__O2(X)_O2(a)_O2(b) | Source: seed_aggregate | Test MSE: 1.215451e-06 ± 5.022488e-07 | MSE ratio: 0.6215 ± 0.5233 | Relative deterioration: -37.85% ± 52.33%
+Species:  3 | Experiment: 3__O2(X)_O2(a)_O(3P) | Source: seed_aggregate | Test MSE: 1.467501e-02 ± 2.906518e-03 | MSE ratio: 7504.2485 ± 5701.6710 | Relative deterioration: +750324.85% ± 570167.10%
 Species:  4 | Experiment: 4__O2(X)_O2(a)_O2(b)_O2(Hz) | Source: seed_aggregate | Test MSE: 1.058548e-06 ± 5.483076e-07 | MSE ratio: 0.5413 ± 0.4861 | Relative deterioration: -45.87% ± 48.61%
 Species:  5 | Experiment: 5__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X) | Source: seed_aggregate | Test MSE: 1.552038e-06 ± 8.056196e-07 | MSE ratio: 0.7937 ± 0.7132 | Relative deterioration: -20.63% ± 71.32%
 Species:  6 | Experiment: 6__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P) | Source: seed_aggregate | Test MSE: 2.437457e-06 ± 1.958430e-06 | MSE ratio: 1.2464 ± 1.3560 | Relative deterioration: +24.64% ± 135.60%

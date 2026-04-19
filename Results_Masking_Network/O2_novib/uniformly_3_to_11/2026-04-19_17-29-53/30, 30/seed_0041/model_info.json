@@ -1,0 +1,17 @@
+{
+    "architecture": [
+        30,
+        30
+    ],
+    "seed": 41,
+    "activation": "tanh",
+    "input_dim": 44,
+    "output_dim": 3,
+    "num_parameters": 2373,
+    "epochs_ran": 1980,
+    "best_epoch": 1880,
+    "final_train_loss": 0.00676223290256328,
+    "final_val_loss": 0.007749518398195505,
+    "best_val_loss": 0.006858483627438545,
+    "training_time_s": 140.47717881202698
+}

@@ -109,7 +109,7 @@ class LoadMultiPressureDatasetTorch(torch.utils.data.Dataset):
 # ----------------------------------------------------------------------------------------
 # Setup
 
-EXPERIMENT_NAME = "FullRun_3to11species"
+EXPERIMENT_NAME = "Run3Species" #"FullRun_3to11species"
 
 SPECIES_MAP = {
     "O2(X)": [0, 11],
@@ -131,16 +131,17 @@ ALL_SPECIES = list(SPECIES_MAP.keys())
 SEEDS = list(range(32, 52))
 
 SPECIES_CONFIGS = [
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)"],
-    ["O2(X)", "O2(a)", "O2(b)"],
-    ["O2(X)", "O2(a)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)"],
+    #["O2(X)", "O2(a)", "O2(b)", "O2(Hz)"],
+    #["O2(X)", "O2(a)", "O2(b)"],
+    #["O2(X)", "O2(a)"],
+    ["O2(X)", "O2(a)", "O(3P)"],
 ]
 
 ARCHITECTURES = [

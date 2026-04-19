@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Tuple
 import importlib.util
 
 
@@ -19,16 +19,15 @@ class TrainingConfig:
     device: str = "cpu"
     multiply_targets_by: float = 1e30
 
+    # Experiment-level seed for deterministic top-level behavior.
     seed_global: int = 43
-    seed_split: int = 43
-    seed_shuffle: int = 43
-    seed_weights: int = 43
-    seed_training_masks: int = 43
-    seed_validation_masks: int = 43
-    seed_evaluation_masks: int = 43
 
+    # Independent full training runs, analogous to your FullRun setup.
+    seeds: Tuple[int, ...] = tuple(range(32, 52))
+
+    # Masking setup
     min_observed_species_train: int = 3
-    num_eval_repeats: int = 50
+    num_eval_repeats_per_count: int = 50
 
     results_root_name: str = "Results_Masking_Network"
 
@@ -45,19 +44,10 @@ class DatasetConfig:
 
 
 @dataclass(frozen=True)
-class EvaluationRegime:
-    name: str
-    mode: str
-    exact_species_count: int | None = None
-    repeats: int = 1
-
-
-@dataclass(frozen=True)
 class ExperimentConfig:
     project_root: Path
     training: TrainingConfig
     dataset: DatasetConfig
-    evaluation_regimes: Tuple[EvaluationRegime, ...] = field(default_factory=tuple)
 
     @property
     def feature_dim(self) -> int:
@@ -78,6 +68,10 @@ class ExperimentConfig:
             f"_to_{self.dataset.num_species}"
         )
 
+    @property
+    def evaluation_species_counts(self) -> Tuple[int, ...]:
+        return tuple(range(self.training.min_observed_species_train, self.dataset.num_species + 1))
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "project_root": str(self.project_root),
@@ -87,11 +81,11 @@ class ExperimentConfig:
                 "main_dataset": str(self.dataset.main_dataset),
                 "main_dataset_test": str(self.dataset.main_dataset_test),
             },
-            "evaluation_regimes": [asdict(r) for r in self.evaluation_regimes],
             "feature_dim": self.feature_dim,
             "model_input_dim": self.model_input_dim,
             "output_dim": self.output_dim,
             "experiment_name": self.experiment_name,
+            "evaluation_species_counts": list(self.evaluation_species_counts),
         }
 
 
@@ -124,7 +118,10 @@ def find_project_root(start_path: Path) -> Path:
     )
 
 
-def build_experiment_config(project_root: Path, training_cfg: TrainingConfig | None = None) -> ExperimentConfig:
+def build_experiment_config(
+    project_root: Path,
+    training_cfg: TrainingConfig | None = None,
+) -> ExperimentConfig:
     training_cfg = training_cfg or TrainingConfig()
     project_root = project_root.resolve()
 
@@ -145,21 +142,8 @@ def build_experiment_config(project_root: Path, training_cfg: TrainingConfig | N
         main_dataset_test=(project_root / scheme_dict["main_dataset_test"]).resolve(),
     )
 
-    evaluation_regimes = (
-        EvaluationRegime(name="all_species_observed", mode="all", repeats=1),
-        EvaluationRegime(name="exactly_5_species", mode="exact", exact_species_count=5, repeats=training_cfg.num_eval_repeats),
-        EvaluationRegime(name="exactly_3_species", mode="exact", exact_species_count=3, repeats=training_cfg.num_eval_repeats),
-        EvaluationRegime(
-            name=f"uniform_random_{training_cfg.min_observed_species_train}_to_{dataset_cfg.num_species}_species",
-            mode="uniform_range",
-            exact_species_count=None,
-            repeats=training_cfg.num_eval_repeats,
-        ),
-    )
-
     return ExperimentConfig(
         project_root=project_root,
         training=training_cfg,
         dataset=dataset_cfg,
-        evaluation_regimes=evaluation_regimes,
     )

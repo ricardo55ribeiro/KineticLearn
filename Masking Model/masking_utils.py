@@ -1,18 +1,22 @@
 from __future__ import annotations
 
 import json
-import math
-import os
 import random
-from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, Sequence
+from typing import Any, Dict, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
+
+
+ARCH_COLORS = {
+    "30, 30": "blue",
+    "30, 30, 30": "green",
+    "50, 50": "red",
+}
 
 
 def set_global_seed(seed: int) -> None:
@@ -21,6 +25,9 @@ def set_global_seed(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    if hasattr(torch.backends, "cudnn"):
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 
 def moving_average(x: Sequence[float], window: int = 25) -> np.ndarray:
@@ -36,6 +43,10 @@ def moving_average(x: Sequence[float], window: int = 25) -> np.ndarray:
 
 def arch_to_folder_name(hidden_size: Sequence[int]) -> str:
     return ", ".join(str(h) for h in hidden_size)
+
+
+def get_color_for_architecture(label: str) -> str:
+    return ARCH_COLORS.get(label, "black")
 
 
 def make_results_root(base_root: Path, scheme: str, experiment_name: str, add_timestamp: bool = True) -> Path:
@@ -100,99 +111,6 @@ def plot_loss_curves(history: dict[str, list[float]], output_path: Path, log_sca
     plt.close()
 
 
-def relative_error_against_prediction(true_values: np.ndarray, predicted_values: np.ndarray, epsilon: float = 1e-30) -> np.ndarray:
-    denominator = predicted_values.copy()
-    denominator[np.abs(denominator) < epsilon] = epsilon
-    return np.abs((predicted_values - true_values) / denominator)
-
-
-def plot_predicted_vs_true(
-    targets_scaled: np.ndarray,
-    outputs_scaled: np.ndarray,
-    output_path: Path,
-    regime_name: str,
-) -> None:
-    output_dim = targets_scaled.shape[1]
-    plt.rcParams.update({"font.size": 14, "text.usetex": False})
-    fig, axes = plt.subplots(1, output_dim, figsize=(5 * output_dim, 5), sharey=True)
-    if output_dim == 1:
-        axes = [axes]
-
-    for output_idx in range(output_dim):
-        ax = axes[output_idx]
-        ax.scatter(targets_scaled[:, output_idx], outputs_scaled[:, output_idx], alpha=0.8, color=(0.0, 0.0, 0.9))
-        ax.plot(np.linspace(0, 1, 100), np.linspace(0, 1, 100), "--", color="black")
-        ax.set_xlabel("True Values")
-        if output_idx == 0:
-            ax.set_ylabel("Predicted Values")
-        ax.set_title(f"$k_{{{output_idx + 1}}}$")
-
-        rel_err = relative_error_against_prediction(
-            true_values=targets_scaled[:, output_idx],
-            predicted_values=outputs_scaled[:, output_idx],
-            epsilon=1e-9,
-        )
-        max_index = int(np.argmax(rel_err))
-        ax.scatter(
-            targets_scaled[max_index, output_idx],
-            outputs_scaled[max_index, output_idx],
-            color="gold",
-            zorder=2,
-        )
-        text = "\n".join(
-            (
-                rf"$Mean\ \delta_{{rel}}={100.0 * rel_err.mean():.2f}\%$",
-                rf"$Max\ \delta_{{rel}}={100.0 * rel_err.max():.2f}\%$",
-                rf"$Regime: {regime_name}$",
-            )
-        )
-        ax.text(0.58, 0.28, text, fontsize=11, transform=ax.transAxes, verticalalignment="top", bbox=dict(boxstyle="round", alpha=0.5))
-        if output_idx > 0:
-            ax.tick_params(left=False)
-
-    plt.tight_layout()
-    plt.savefig(output_path)
-    plt.close(fig)
-
-
-def save_predictions_csv(
-    output_path: Path,
-    targets_scaled: np.ndarray,
-    outputs_scaled_mean: np.ndarray,
-    targets_unscaled: np.ndarray,
-    outputs_unscaled_mean: np.ndarray,
-    outputs_scaled_std: np.ndarray | None = None,
-    outputs_unscaled_std: np.ndarray | None = None,
-) -> None:
-    n_samples, n_outputs = targets_scaled.shape
-    data: dict[str, Any] = {"sample_id": np.arange(n_samples)}
-
-    for output_idx in range(n_outputs):
-        abs_err = np.abs(outputs_unscaled_mean[:, output_idx] - targets_unscaled[:, output_idx])
-        sq_err = (outputs_unscaled_mean[:, output_idx] - targets_unscaled[:, output_idx]) ** 2
-        rel_err = relative_error_against_prediction(
-            true_values=targets_unscaled[:, output_idx],
-            predicted_values=outputs_unscaled_mean[:, output_idx],
-            epsilon=1e-30,
-        )
-
-        data[f"k{output_idx + 1}_true_scaled"] = targets_scaled[:, output_idx]
-        data[f"k{output_idx + 1}_pred_scaled_mean"] = outputs_scaled_mean[:, output_idx]
-        if outputs_scaled_std is not None:
-            data[f"k{output_idx + 1}_pred_scaled_std"] = outputs_scaled_std[:, output_idx]
-
-        data[f"k{output_idx + 1}_true_unscaled"] = targets_unscaled[:, output_idx]
-        data[f"k{output_idx + 1}_pred_unscaled_mean"] = outputs_unscaled_mean[:, output_idx]
-        if outputs_unscaled_std is not None:
-            data[f"k{output_idx + 1}_pred_unscaled_std"] = outputs_unscaled_std[:, output_idx]
-
-        data[f"k{output_idx + 1}_abs_err"] = abs_err
-        data[f"k{output_idx + 1}_sq_err"] = sq_err
-        data[f"k{output_idx + 1}_rel_err"] = rel_err
-
-    pd.DataFrame(data).to_csv(output_path, index=False)
-
-
 def save_test_inputs_csv(output_path: Path, x_test_unscaled: np.ndarray, feature_names: Sequence[str]) -> None:
     df = pd.DataFrame(x_test_unscaled, columns=list(feature_names))
     df.insert(0, "sample_id", np.arange(len(df)))
@@ -214,11 +132,12 @@ def save_summary_csv(output_path: Path, rows: Sequence[dict[str, Any]]) -> None:
 
 
 def save_global_summary_text(output_path: Path, rows: Sequence[dict[str, Any]]) -> None:
-    parts: list[str] = ["Architecture comparison summary", ""]
+    parts: list[str] = ["Summary", ""]
     for row in rows:
-        parts.append(f"Architecture: {row.get('architecture')}")
+        first_key = next(iter(row.keys()), "row")
+        parts.append(f"{first_key}: {row.get(first_key)}")
         for key, value in row.items():
-            if key == "architecture":
+            if key == first_key:
                 continue
             parts.append(f"  {key}: {_stringify_if_needed(value)}")
         parts.append("")
@@ -233,3 +152,113 @@ def _stringify_if_needed(value: Any) -> Any:
     if isinstance(value, dict):
         return json.dumps(value)
     return value
+
+
+def sanitize_yerr_for_log(y: np.ndarray, yerr: np.ndarray) -> np.ndarray:
+    y = np.asarray(y, dtype=float)
+    yerr = np.asarray(yerr, dtype=float)
+    yerr = np.where(np.isnan(yerr), 0.0, yerr)
+    yerr = np.where(yerr < 0.0, 0.0, yerr)
+    return np.minimum(yerr, np.maximum(0.0, 0.999 * y))
+
+
+def plot_architecture_curves(
+    aggregated_rows: Sequence[dict[str, Any]] | pd.DataFrame,
+    output_path: Path,
+    y_col: str,
+    yerr_col: str | None,
+    title: str,
+    y_label: str,
+    yscale: str | None = None,
+    architecture_order: Sequence[str] | None = None,
+) -> None:
+    df = aggregated_rows if isinstance(aggregated_rows, pd.DataFrame) else pd.DataFrame(aggregated_rows)
+    if df.empty or y_col not in df.columns:
+        return
+
+    df = df.copy()
+    df["observed_species_count"] = pd.to_numeric(df["observed_species_count"], errors="coerce")
+    df[y_col] = pd.to_numeric(df[y_col], errors="coerce")
+
+    if architecture_order is None:
+        architecture_order = sorted(df["architecture"].dropna().unique().tolist())
+
+    plt.rcParams.update({"font.size": 14, "text.usetex": False})
+    plt.figure(figsize=(9, 6))
+
+    plotted_any = False
+    multiple_architectures = len(architecture_order) > 1
+
+    for architecture_label in architecture_order:
+        df_arch = df[df["architecture"] == architecture_label].copy()
+        df_arch = df_arch.dropna(subset=["observed_species_count", y_col]).sort_values("observed_species_count")
+        if df_arch.empty:
+            continue
+
+        x = df_arch["observed_species_count"].to_numpy(dtype=float)
+        y = df_arch[y_col].to_numpy(dtype=float)
+
+        yerr = None
+        use_errorbars = False
+        if yerr_col is not None and yerr_col in df_arch.columns:
+            yerr_series = pd.to_numeric(df_arch[yerr_col], errors="coerce")
+            if yerr_series.notna().any():
+                yerr = yerr_series.to_numpy(dtype=float)
+                yerr = np.where(np.isnan(yerr), 0.0, yerr)
+                yerr = np.where(yerr < 0.0, 0.0, yerr)
+                if yscale == "log":
+                    yerr = sanitize_yerr_for_log(y, yerr)
+                use_errorbars = np.any(yerr > 0)
+
+        color = get_color_for_architecture(architecture_label)
+        label = architecture_label if multiple_architectures else None
+
+        if use_errorbars:
+            plt.errorbar(
+                x,
+                y,
+                yerr=yerr,
+                marker="o",
+                linewidth=1.8,
+                elinewidth=1.2,
+                capsize=4,
+                color=color,
+                label=label,
+            )
+        else:
+            plt.plot(
+                x,
+                y,
+                marker="o",
+                linewidth=1.8,
+                color=color,
+                label=label,
+            )
+
+        plotted_any = True
+
+    if not plotted_any:
+        plt.close()
+        return
+
+    plt.xlabel("Number of Observed Species")
+    plt.ylabel(y_label)
+    plt.title(title)
+
+    if yscale == "log":
+        positive = pd.to_numeric(df[y_col], errors="coerce").dropna()
+        if not positive.empty and (positive > 0).all():
+            plt.yscale("log")
+    elif yscale == "symlog":
+        plt.yscale("symlog", linthresh=1.0)
+
+    xticks = sorted(pd.to_numeric(df["observed_species_count"], errors="coerce").dropna().unique().tolist())
+    plt.xticks(xticks)
+    plt.grid(True, which="both", alpha=0.3)
+
+    if multiple_architectures:
+        plt.legend(frameon=False)
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300)
+    plt.close()
