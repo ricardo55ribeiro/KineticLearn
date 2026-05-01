@@ -1,0 +1,55 @@
+{
+    "scheme": "9Ks_Dataset",
+    "experiment_name": "3species_to_9Ks",
+    "run_timestamp": "2026-04-22_19-13-57",
+    "train_file": "Old Datasets\\datapoints_all.txt",
+    "test_file": "Old Datasets\\datapoints_all_test.txt",
+    "num_pressure_conditions": 1,
+    "num_species_total": 3,
+    "num_species_kept": 3,
+    "species_all": [
+        "O2(X)",
+        "O2(a)",
+        "O(3P)"
+    ],
+    "kept_species": [
+        "O2(X)",
+        "O2(a)",
+        "O(3P)"
+    ],
+    "removed_species": [],
+    "k_columns": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+    ],
+    "architectures_tested": [
+        [
+            30,
+            30
+        ],
+        [
+            50,
+            50
+        ],
+        [
+            30,
+            30,
+            30
+        ]
+    ],
+    "activation": "tanh",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "patience": 100,
+    "max_epochs": 5000,
+    "split_seed": 43,
+    "shuffle_seed": 43,
+    "weight_seed": 43
+}

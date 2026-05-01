@@ -1,0 +1,17 @@
+Experiment name: 3__O2(b)_O(3P)_O2+(X)
+Full run timestamp: 2026-04-23_14-32-46
+Seed: 47
+Scheme: O2_novib
+Hidden size: [50, 50]
+Input size: 6
+Kept species: ['O2(b)', 'O(3P)', 'O2+(X)']
+Removed species: ['O2(X)', 'O2(a)', 'O2(Hz)', 'O(1D)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+Test MSE: 0.0011229863157495856
+Test MSE (unscaled): 5.465064010866787e-44
+Training time (s): 170.32772850990295
+Mean relative error k1: 0.05031827464699745
+Max relative error k1: 0.23877590894699097
+Mean relative error k2: 0.06981471180915833
+Max relative error k2: 0.44155484437942505
+Mean relative error k3: 0.007983498275279999
+Max relative error k3: 0.046303145587444305

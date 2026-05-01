@@ -1,0 +1,18 @@
+Experiment name: 3__O2(a)_O2(b)_NONE
+Full run timestamp: 2026-04-23_14-32-46
+Seed: 50
+Scheme: O2_novib
+Hidden size: [50, 50]
+Input size: 4
+Kept species: ['O2(a)', 'O2(b)']
+Display species for folder: ['O2(a)', 'O2(b)', 'NONE']
+Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O(1D)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+Test MSE: 5.4026199904910754e-06
+Test MSE (unscaled): 1.401298464324817e-45
+Training time (s): 174.8933229446411
+Mean relative error k1: 0.005988507065922022
+Max relative error k1: 0.029474802315235138
+Mean relative error k2: 0.0015037800185382366
+Max relative error k2: 0.008812973275780678
+Mean relative error k3: 0.001387059804983437
+Max relative error k3: 0.007830268703401089

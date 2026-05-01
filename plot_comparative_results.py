@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+SPECIES_MIN = 2
 ZOOM_MIN = 3
 
 SCHEME = "O2_novib"
@@ -633,7 +634,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
         yerr_col="test_mse_std",
         y_label="Test MSE",
         filename=arch_dir / "test_mse_vs_num_species.pdf",
-        title=f"{arch_label} — Test MSE vs number of species ({ZOOM_MIN} to 11 species)",
+        title=f"{arch_label} — Test MSE vs number of species ({SPECIES_MIN} to 11 species)",
         yscale="log",
     )
 
@@ -655,7 +656,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
         y_col="relative_deterioration_test_mse_pct",
         y_label="Relative deterioration in test MSE (%)",
         filename=arch_dir / "relative_deterioration_vs_num_species.pdf",
-        title=f"{arch_label} — Relative deterioration vs number of species ({ZOOM_MIN} to 11 species)",
+        title=f"{arch_label} — Relative deterioration vs number of species ({SPECIES_MIN} to 11 species)",
         yscale="symlog",
     )
 
@@ -678,7 +679,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
             yerr_col="mean_rel_error_avg_std",
             y_label="Mean relative error (average over k's)",
             filename=arch_dir / "mean_relative_error_avg_vs_num_species.pdf",
-            title=f"{arch_label} — Mean relative error vs number of species ({ZOOM_MIN} to 11 species)",
+            title=f"{arch_label} — Mean relative error vs number of species ({SPECIES_MIN} to 11 species)",
             yscale="log",
         )
 
@@ -705,7 +706,7 @@ def make_architecture_plots(arch_dir, arch_label, df_arch):
                 yerr_col=std_col,
                 y_label=f"Mean relative error k{k}",
                 filename=arch_dir / f"mean_relative_error_k{k}_vs_num_species.pdf",
-                title=f"{arch_label} — Mean relative error k{k} vs number of species ({ZOOM_MIN} to 11 species)",
+                title=f"{arch_label} — Mean relative error k{k} vs number of species ({SPECIES_MIN} to 11 species)",
                 yscale="log",
             )
 

@@ -1,0 +1,22 @@
+Architecture report: 50, 50
+
+Definitions:
+  MSE ratio = MSE_current / MSE_baseline
+  Relative deterioration (%) = 100 * (MSE_current - MSE_baseline) / MSE_baseline
+  Baseline = experiment folder starting with '11__' (11 kept species)
+  Error bars are shown only when a standard deviation is available.
+
+Baseline experiment: 11__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd)_O3(X)_O3(exc)
+Baseline number of species: 11
+Baseline test MSE: 3.859375e-06 ± 2.133955e-06
+
+Species:  2 | Experiment: 2__O2(X)_O2(a) | Source: seed_aggregate | Test MSE: 1.539318e-02 ± 7.210195e-05 | MSE ratio: 3988.5174 ± 2205.4408 | Relative deterioration: +398751.74% ± 220544.08%
+Species:  3 | Experiment: 3__O2(X)_O2(a)_O2(b) | Source: seed_aggregate | Test MSE: 1.750322e-06 ± 1.145672e-06 | MSE ratio: 0.4535 ± 0.3886 | Relative deterioration: -54.65% ± 38.86%
+Species:  4 | Experiment: 4__O2(X)_O2(a)_O2(b)_O2(Hz) | Source: seed_aggregate | Test MSE: 1.574114e-06 ± 1.500328e-06 | MSE ratio: 0.4079 ± 0.4494 | Relative deterioration: -59.21% ± 44.94%
+Species:  5 | Experiment: 5__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X) | Source: seed_aggregate | Test MSE: 3.456507e-06 ± 2.292678e-06 | MSE ratio: 0.8956 ± 0.7734 | Relative deterioration: -10.44% ± 77.34%
+Species:  6 | Experiment: 6__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P) | Source: seed_aggregate | Test MSE: 3.238151e-06 ± 2.422448e-06 | MSE ratio: 0.8390 ± 0.7805 | Relative deterioration: -16.10% ± 78.05%
+Species:  7 | Experiment: 7__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D) | Source: seed_aggregate | Test MSE: 3.365779e-06 ± 2.154274e-06 | MSE ratio: 0.8721 ± 0.7376 | Relative deterioration: -12.79% ± 73.76%
+Species:  8 | Experiment: 8__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd) | Source: seed_aggregate | Test MSE: 3.653782e-06 ± 1.984739e-06 | MSE ratio: 0.9467 ± 0.7338 | Relative deterioration: -5.33% ± 73.38%
+Species:  9 | Experiment: 9__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd) | Source: seed_aggregate | Test MSE: 4.058045e-06 ± 1.953964e-06 | MSE ratio: 1.0515 ± 0.7709 | Relative deterioration: +5.15% ± 77.09%
+Species: 10 | Experiment: 10__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd)_O3(X) | Source: seed_aggregate | Test MSE: 3.828206e-06 ± 2.388790e-06 | MSE ratio: 0.9919 ± 0.8270 | Relative deterioration: -0.81% ± 82.70%
+Species: 11 | Experiment: 11__O2(X)_O2(a)_O2(b)_O2(Hz)_O2+(X)_O(3P)_O(1D)_O+(gnd)_O-(gnd)_O3(X)_O3(exc) | Source: seed_aggregate | Test MSE: 3.859375e-06 ± 2.133955e-06 | MSE ratio: 1.0000 ± 0.0000 | Relative deterioration: +0.00% ± 0.00%
