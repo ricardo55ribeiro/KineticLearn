@@ -1,0 +1,89 @@
+{
+    "scheme": "O2_novib",
+    "experiment_name": "InverseProblem_GaussianNoiseRobustness",
+    "saved_weights_root": "saved_weights",
+    "species_configs": [
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)",
+            "O(3P)",
+            "O(1D)",
+            "O+(gnd)",
+            "O-(gnd)",
+            "O3(X)",
+            "O3(exc)"
+        ],
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)"
+        ],
+        [
+            "O2(a)",
+            "O2(b)"
+        ]
+    ],
+    "architectures": [
+        [
+            30,
+            30
+        ],
+        [
+            50,
+            50
+        ],
+        [
+            30,
+            30,
+            30
+        ]
+    ],
+    "seeds": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+    ],
+    "noise_stds": [
+        0.0,
+        0.005,
+        0.01,
+        0.02,
+        0.05,
+        0.1
+    ],
+    "noise_labels": [
+        "0%",
+        "0.5%",
+        "1%",
+        "2%",
+        "5%",
+        "10%"
+    ],
+    "noise_repeats": 20,
+    "noise_base_seed": 12345,
+    "main_metric": "test_mse_scaled",
+    "noise_type": "multiplicative Gaussian noise applied to all selected unscaled input-density features",
+    "resample_negative_densities": true,
+    "max_noise_resample_attempts": 1000,
+    "cache_policy": "load compatible saved_weights model; otherwise train and save before evaluation"
+}

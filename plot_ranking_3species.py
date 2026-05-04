@@ -1,6 +1,4 @@
 import ast
-import os
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -9,7 +7,6 @@ import pandas as pd
 SCHEME = "O2_novib"
 EXPERIMENT_NAME = "FullRun_All3SpeciesCombinations"
 FULLRUN_PARENT = Path("Results_NN") / SCHEME / EXPERIMENT_NAME
-FULLRUN_TIMESTAMP = None   # None -> use latest timestamp folder
 ANALYSIS_DIR_NAME = "Comparative_Analysis"
 
 ARCHITECTURES = [
@@ -51,26 +48,7 @@ def get_selected_fullrun_dir():
     if not FULLRUN_PARENT.exists():
         raise FileNotFoundError(f"FullRun folder not found: {FULLRUN_PARENT}")
 
-    if FULLRUN_TIMESTAMP is not None:
-        selected = FULLRUN_PARENT / FULLRUN_TIMESTAMP
-        if not selected.exists():
-            raise FileNotFoundError(f"Requested timestamp folder not found: {selected}")
-        return selected
-
-    timestamp_dirs = []
-    for path in FULLRUN_PARENT.iterdir():
-        if not path.is_dir():
-            continue
-        try:
-            datetime.strptime(path.name, "%Y-%m-%d_%H-%M-%S")
-            timestamp_dirs.append(path)
-        except ValueError:
-            pass
-
-    if not timestamp_dirs:
-        raise RuntimeError(f"No timestamp folders found inside: {FULLRUN_PARENT}")
-
-    return sorted(timestamp_dirs, key=lambda p: p.name)[-1]
+    return FULLRUN_PARENT
 
 
 def format_combination_from_experiment_name(experiment_name):

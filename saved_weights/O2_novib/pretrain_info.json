@@ -1,0 +1,84 @@
+{
+    "script": "Train_SavedWeights.py",
+    "purpose": "Pretrain/reuse neural-network models into the shared saved_weights cache without running noise robustness or full-result workflows.",
+    "scheme": "O2_novib",
+    "saved_weights_root": "saved_weights",
+    "scheme_saved_weights_root": "saved_weights\\O2_novib",
+    "species_configs": [
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)",
+            "O(3P)",
+            "O(1D)",
+            "O+(gnd)",
+            "O-(gnd)",
+            "O3(X)",
+            "O3(exc)"
+        ],
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)"
+        ],
+        [
+            "O2(a)",
+            "O2(b)"
+        ]
+    ],
+    "architectures": [
+        [
+            30,
+            30
+        ],
+        [
+            50,
+            50
+        ],
+        [
+            30,
+            30,
+            30
+        ]
+    ],
+    "seeds": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+    ],
+    "num_species_configs": 3,
+    "num_architectures": 3,
+    "num_seeds": 20,
+    "num_planned_models": 180,
+    "activation": "tanh",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "max_epochs": 5000,
+    "patience": 100,
+    "val_split": 0.1,
+    "force_retrain": false,
+    "cache_policy": "If FORCE_RETRAIN is False, load compatible saved_weights models; train and save only missing or incompatible models. If FORCE_RETRAIN is True, delete each matching model directory first.",
+    "summary_files": {
+        "summary_csv": "saved_weights\\O2_novib\\pretrain_summary.csv",
+        "aggregate_csv": "saved_weights\\O2_novib\\pretrain_aggregate_summary.csv"
+    }
+}

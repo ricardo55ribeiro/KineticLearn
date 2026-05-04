@@ -35,7 +35,6 @@ ARCH_COLORS = {
     "50, 50": "red",
 }
 
-TIMESTAMP_REGEX = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}$")
 EXPERIMENT_REGEX = re.compile(r"^\d+__")
 
 
@@ -75,17 +74,6 @@ def hidden_size_sort_key(hidden_size_tuple):
 
 def get_color_for_architecture(label):
     return ARCH_COLORS.get(label, "black")
-
-
-def find_timestamp_ancestor(path: Path):
-    for ancestor in [path, *path.parents]:
-        if TIMESTAMP_REGEX.match(ancestor.name):
-            return ancestor.name
-    return ""
-
-
-def timestamp_sort_key(text: str):
-    return text if text else ""
 
 
 def is_valid_experiment_dir(path: Path):
@@ -238,19 +226,11 @@ def summarize_seed_aggregate_df(df, experiment_folder, run_timestamp):
     return out
 
 
-def get_latest_fullrun_dir():
+def get_fullrun_dir():
     if not FULLRUN_PARENT.exists():
         raise FileNotFoundError(f"FullRun folder not found: {FULLRUN_PARENT}")
 
-    run_dirs = [
-        d for d in FULLRUN_PARENT.iterdir()
-        if d.is_dir() and TIMESTAMP_REGEX.match(d.name)
-    ]
-
-    if not run_dirs:
-        raise RuntimeError(f"No timestamp run folders found inside: {FULLRUN_PARENT}")
-
-    return sorted(run_dirs, key=lambda p: p.name)[-1]
+    return FULLRUN_PARENT
 
 def collect_latest_experiment_tables():
     if not SCHEME_ROOT.exists():
@@ -258,7 +238,7 @@ def collect_latest_experiment_tables():
 
     candidates = {}
 
-    search_root = get_latest_fullrun_dir()
+    search_root = get_fullrun_dir()
 
     for csv_path in search_root.rglob("*.csv"):
         if csv_path.name not in {"summary.csv", "seed_aggregate_summary.csv"}:
@@ -269,7 +249,7 @@ def collect_latest_experiment_tables():
             continue
 
         experiment_name = experiment_dir.name
-        run_timestamp = find_timestamp_ancestor(experiment_dir)
+        run_timestamp = ""
         source_priority = 1 if csv_path.name == "seed_aggregate_summary.csv" else 0
 
         info = {
@@ -284,8 +264,8 @@ def collect_latest_experiment_tables():
             candidates[experiment_name] = info
             continue
 
-        prev_key = (timestamp_sort_key(prev["run_timestamp"]), prev["source_priority"], prev["mtime"])
-        curr_key = (timestamp_sort_key(info["run_timestamp"]), info["source_priority"], info["mtime"])
+        prev_key = (prev["source_priority"], prev["mtime"])
+        curr_key = (info["source_priority"], info["mtime"])
         if curr_key > prev_key:
             candidates[experiment_name] = info
 
