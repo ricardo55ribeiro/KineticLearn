@@ -1058,9 +1058,12 @@ SEEDS = list(range(32, 52))
 # O2(X) /  O2(a)  /  O2(b)  / O2(Hz) / O2+(X) / O(3P)
 # O(1D) / O+(gnd) / O-(gnd) /  O3(X) / O3(exc)
 SPECIES_CONFIGS = [
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)", "O3(exc)"],
-    ["O2(X)", "O2(a)", "O2(b)"],
-    ["O2(a)", "O2(b)"],
+    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)"],
+    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)"],
+    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)"],
+    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)"],
+    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)"],
+    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)"],
 ]
 
 ARCHITECTURES = [

@@ -1050,7 +1050,10 @@ EXPERIMENT_NAME = "FullRun_All3SpeciesCombinations"
 # O2(X) /  O2(a)  /  O2(b)  / O2(Hz) / O2+(X) / O(3P)
 # O(1D) / O+(gnd) / O-(gnd) /  O3(X) / O3(exc)
 TARGET_SPECIES_QUEUE = [
-    ["O2(a)", "O2(b)"],
+    ["O2(a)", "O2(b)", "O(1D)"],
+    ["O2(a)", "O2(b)", "O3(exc)"],
+    ["O2(a)", "O2(b)", "O3(X)"],
+    ["O2(b)", "O(1D)", "O3(exc)"],
 ]
 
 PLACEHOLDER_SPECIES = "NONE"

@@ -1,0 +1,1141 @@
+Architecture comparison summary
+
+Seed: 32
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0032\30, 30\model.pth
+  Test MSE: 7.4420154305698816e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 178.14353919029236
+  Cached training time (s): 178.14353919029236
+  Mean rel err k1: 0.006719493772834539
+  Max rel err k1: 0.03485428914427757
+  Mean rel err k2: 0.0020446302369236946
+  Max rel err k2: 0.008933977223932743
+  Mean rel err k3: 0.0015479868743568659
+  Max rel err k3: 0.00670879241079092
+
+Seed: 32
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0032\50, 50\model.pth
+  Test MSE: 2.0539860088319983e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 295.4657175540924
+  Cached training time (s): 295.4657175540924
+  Mean rel err k1: 0.0034146918915212154
+  Max rel err k1: 0.016633518040180206
+  Mean rel err k2: 0.0008407752029597759
+  Max rel err k2: 0.004293377511203289
+  Mean rel err k3: 0.0011223924811929464
+  Max rel err k3: 0.003766748122870922
+
+Seed: 32
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0032\30, 30, 30\model.pth
+  Test MSE: 7.354480544563557e-07
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 173.49889612197876
+  Cached training time (s): 173.49889612197876
+  Mean rel err k1: 0.001473123556934297
+  Max rel err k1: 0.0077537670731544495
+  Mean rel err k2: 0.000999509822577238
+  Max rel err k2: 0.004720662254840136
+  Mean rel err k3: 0.0009646796970628202
+  Max rel err k3: 0.003877362236380577
+
+Seed: 33
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0033\30, 30\model.pth
+  Test MSE: 6.849080818938091e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 197.10094285011292
+  Cached training time (s): 197.10094285011292
+  Mean rel err k1: 0.00648216437548399
+  Max rel err k1: 0.03450922667980194
+  Mean rel err k2: 0.0018856797832995653
+  Max rel err k2: 0.006249330937862396
+  Mean rel err k3: 0.001187280286103487
+  Max rel err k3: 0.00483339000493288
+
+Seed: 33
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0033\50, 50\model.pth
+  Test MSE: 1.789723796719045e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 348.0115211009979
+  Cached training time (s): 348.0115211009979
+  Mean rel err k1: 0.00271667935885489
+  Max rel err k1: 0.015672855079174042
+  Mean rel err k2: 0.00096692587248981
+  Max rel err k2: 0.005042839329689741
+  Mean rel err k3: 0.0007605170249007642
+  Max rel err k3: 0.0028113601729273796
+
+Seed: 33
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0033\30, 30, 30\model.pth
+  Test MSE: 1.0797789400385227e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 191.0301628112793
+  Cached training time (s): 191.0301628112793
+  Mean rel err k1: 0.0016262988792732358
+  Max rel err k1: 0.013492878526449203
+  Mean rel err k2: 0.0007929633720777929
+  Max rel err k2: 0.0036289950367063284
+  Mean rel err k3: 0.0010361223248764873
+  Max rel err k3: 0.0043937829323112965
+
+Seed: 34
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0034\30, 30\model.pth
+  Test MSE: 2.5661247491370887e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 219.35505485534668
+  Cached training time (s): 219.35505485534668
+  Mean rel err k1: 0.003907888662070036
+  Max rel err k1: 0.018851488828659058
+  Mean rel err k2: 0.0011777293402701616
+  Max rel err k2: 0.005363893695175648
+  Mean rel err k3: 0.0008777026669122279
+  Max rel err k3: 0.003388844197615981
+
+Seed: 34
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0034\50, 50\model.pth
+  Test MSE: 3.4574875371617964e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 153.81575679779053
+  Cached training time (s): 153.81575679779053
+  Mean rel err k1: 0.004394047893583775
+  Max rel err k1: 0.022701477631926537
+  Mean rel err k2: 0.0014617039123550057
+  Max rel err k2: 0.009340339340269566
+  Mean rel err k3: 0.0013588489964604378
+  Max rel err k3: 0.007748533971607685
+
+Seed: 34
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0034\30, 30, 30\model.pth
+  Test MSE: 7.291087626981607e-07
+  Test MSE (unscaled): 0.0
+  Current-run training time (s): 170.7022740840912
+  Cached training time (s): 170.7022740840912
+  Mean rel err k1: 0.0016411234391853213
+  Max rel err k1: 0.008982808329164982
+  Mean rel err k2: 0.0008747734827920794
+  Max rel err k2: 0.004792655352503061
+  Mean rel err k3: 0.0005280656623654068
+  Max rel err k3: 0.001958513865247369
+
+Seed: 35
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0035\30, 30\model.pth
+  Test MSE: 3.3222161164303543e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 160.80323839187622
+  Cached training time (s): 160.80323839187622
+  Mean rel err k1: 0.0044033108279109
+  Max rel err k1: 0.022907640784978867
+  Mean rel err k2: 0.0014104690635576844
+  Max rel err k2: 0.0050743985921144485
+  Mean rel err k3: 0.0010572413448244333
+  Max rel err k3: 0.004592255223542452
+
+Seed: 35
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0035\50, 50\model.pth
+  Test MSE: 2.805685653584078e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 147.24521398544312
+  Cached training time (s): 147.24521398544312
+  Mean rel err k1: 0.004085116554051638
+  Max rel err k1: 0.020558955147862434
+  Mean rel err k2: 0.0010375004494562745
+  Max rel err k2: 0.0043192459270358086
+  Mean rel err k3: 0.0010858807945623994
+  Max rel err k3: 0.0036042791325598955
+
+Seed: 35
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0035\30, 30, 30\model.pth
+  Test MSE: 2.5771375931071816e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 112.41161036491394
+  Cached training time (s): 112.41161036491394
+  Mean rel err k1: 0.0034757195971906185
+  Max rel err k1: 0.016211412847042084
+  Mean rel err k2: 0.0011362411314621568
+  Max rel err k2: 0.008375869132578373
+  Mean rel err k3: 0.0014685995411127806
+  Max rel err k3: 0.006369019392877817
+
+Seed: 36
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0036\30, 30\model.pth
+  Test MSE: 7.5544371611613315e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 103.82649517059326
+  Cached training time (s): 103.82649517059326
+  Mean rel err k1: 0.006404551677405834
+  Max rel err k1: 0.03449312970042229
+  Mean rel err k2: 0.0026287517976015806
+  Max rel err k2: 0.009933012537658215
+  Mean rel err k3: 0.0011827383423224092
+  Max rel err k3: 0.0037666568532586098
+
+Seed: 36
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0036\50, 50\model.pth
+  Test MSE: 3.988031949120341e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 168.9443609714508
+  Cached training time (s): 168.9443609714508
+  Mean rel err k1: 0.004989331588149071
+  Max rel err k1: 0.022701594978570938
+  Mean rel err k2: 0.0016845703357830644
+  Max rel err k2: 0.005888152867555618
+  Mean rel err k3: 0.0008663601474836469
+  Max rel err k3: 0.003106794087216258
+
+Seed: 36
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0036\30, 30, 30\model.pth
+  Test MSE: 2.0279251202737214e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 147.3343152999878
+  Cached training time (s): 147.3343152999878
+  Mean rel err k1: 0.0026654487010091543
+  Max rel err k1: 0.017408760264515877
+  Mean rel err k2: 0.0014594352105632424
+  Max rel err k2: 0.007744779344648123
+  Mean rel err k3: 0.0009175333543680608
+  Max rel err k3: 0.0037337024696171284
+
+Seed: 37
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0037\30, 30\model.pth
+  Test MSE: 5.787023837910965e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 117.21818232536316
+  Cached training time (s): 117.21818232536316
+  Mean rel err k1: 0.006145138759166002
+  Max rel err k1: 0.032199203968048096
+  Mean rel err k2: 0.0019496202003210783
+  Max rel err k2: 0.007407795637845993
+  Mean rel err k3: 0.000971485220361501
+  Max rel err k3: 0.003426741110160947
+
+Seed: 37
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0037\50, 50\model.pth
+  Test MSE: 4.887244358542375e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 129.82566952705383
+  Cached training time (s): 129.82566952705383
+  Mean rel err k1: 0.005795715376734734
+  Max rel err k1: 0.029981503263115883
+  Mean rel err k2: 0.0011375907342880964
+  Max rel err k2: 0.004455085378140211
+  Mean rel err k3: 0.0015644035302102566
+  Max rel err k3: 0.0069378153420984745
+
+Seed: 37
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0037\30, 30, 30\model.pth
+  Test MSE: 1.0614229495331529e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 134.52073693275452
+  Cached training time (s): 134.52073693275452
+  Mean rel err k1: 0.0020516866352409124
+  Max rel err k1: 0.010788965970277786
+  Mean rel err k2: 0.0009398715919815004
+  Max rel err k2: 0.005977904424071312
+  Mean rel err k3: 0.0008264356874860823
+  Max rel err k3: 0.0028560759965330362
+
+Seed: 38
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0038\30, 30\model.pth
+  Test MSE: 3.3830672236945247e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 209.48435425758362
+  Cached training time (s): 209.48435425758362
+  Mean rel err k1: 0.004228578880429268
+  Max rel err k1: 0.02169123664498329
+  Mean rel err k2: 0.0014452643226832151
+  Max rel err k2: 0.006385736167430878
+  Mean rel err k3: 0.0013713192893192172
+  Max rel err k3: 0.0068309553898870945
+
+Seed: 38
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0038\50, 50\model.pth
+  Test MSE: 3.5599784951045876e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 155.77732014656067
+  Cached training time (s): 155.77732014656067
+  Mean rel err k1: 0.004429932218044996
+  Max rel err k1: 0.023365724831819534
+  Mean rel err k2: 0.001347163924947381
+  Max rel err k2: 0.005811343435198069
+  Mean rel err k3: 0.0010696190875023603
+  Max rel err k3: 0.004538831766694784
+
+Seed: 38
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0038\30, 30, 30\model.pth
+  Test MSE: 2.016848384300829e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 182.7460379600525
+  Cached training time (s): 182.7460379600525
+  Mean rel err k1: 0.0027857362292706966
+  Max rel err k1: 0.016227254644036293
+  Mean rel err k2: 0.0011526196030899882
+  Max rel err k2: 0.007291377987712622
+  Mean rel err k3: 0.0008747673127800226
+  Max rel err k3: 0.003734362544491887
+
+Seed: 39
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0039\30, 30\model.pth
+  Test MSE: 2.712634341150988e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 186.54869556427002
+  Cached training time (s): 186.54869556427002
+  Mean rel err k1: 0.003661698428913951
+  Max rel err k1: 0.017306789755821228
+  Mean rel err k2: 0.0018970859237015247
+  Max rel err k2: 0.008769823238253593
+  Mean rel err k3: 0.0010607768781483173
+  Max rel err k3: 0.005117314402014017
+
+Seed: 39
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0039\50, 50\model.pth
+  Test MSE: 1.3478344271788956e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 222.10457491874695
+  Cached training time (s): 222.10457491874695
+  Mean rel err k1: 0.002111743902787566
+  Max rel err k1: 0.013103894889354706
+  Mean rel err k2: 0.0012914204271510243
+  Max rel err k2: 0.004847388714551926
+  Mean rel err k3: 0.0009069468360394239
+  Max rel err k3: 0.002991046756505966
+
+Seed: 39
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0039\30, 30, 30\model.pth
+  Test MSE: 1.951260628629825e-06
+  Test MSE (unscaled): 4.203895392974451e-45
+  Current-run training time (s): 86.77904844284058
+  Cached training time (s): 86.77904844284058
+  Mean rel err k1: 0.00257572322152555
+  Max rel err k1: 0.010890258476138115
+  Mean rel err k2: 0.0012763218255713582
+  Max rel err k2: 0.004935749806463718
+  Mean rel err k3: 0.0019786616321653128
+  Max rel err k3: 0.0060995337553322315
+
+Seed: 40
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0040\30, 30\model.pth
+  Test MSE: 1.5542415212621563e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 219.69174575805664
+  Cached training time (s): 219.69174575805664
+  Mean rel err k1: 0.0029349259566515684
+  Max rel err k1: 0.012740574777126312
+  Mean rel err k2: 0.0011665176134556532
+  Max rel err k2: 0.0060531506314873695
+  Mean rel err k3: 0.0010651854099705815
+  Max rel err k3: 0.0036268208641558886
+
+Seed: 40
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0040\50, 50\model.pth
+  Test MSE: 2.5796132376854075e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 201.65148615837097
+  Cached training time (s): 201.65148615837097
+  Mean rel err k1: 0.003778043668717146
+  Max rel err k1: 0.01989182084798813
+  Mean rel err k2: 0.0013463229406625032
+  Max rel err k2: 0.00523828249424696
+  Mean rel err k3: 0.001028068596497178
+  Max rel err k3: 0.005066016223281622
+
+Seed: 40
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0040\30, 30, 30\model.pth
+  Test MSE: 3.8093537568784086e-06
+  Test MSE (unscaled): 4.203895392974451e-45
+  Current-run training time (s): 90.15430521965027
+  Cached training time (s): 90.15430521965027
+  Mean rel err k1: 0.004257332533597946
+  Max rel err k1: 0.020375287160277367
+  Mean rel err k2: 0.0018016289686784148
+  Max rel err k2: 0.009484449401497841
+  Mean rel err k3: 0.0018212358700111508
+  Max rel err k3: 0.00579534936696291
+
+Seed: 41
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0041\30, 30\model.pth
+  Test MSE: 3.826800821116194e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 163.53521752357483
+  Cached training time (s): 163.53521752357483
+  Mean rel err k1: 0.004880008287727833
+  Max rel err k1: 0.02168874442577362
+  Mean rel err k2: 0.0014073926722630858
+  Max rel err k2: 0.005469972267746925
+  Mean rel err k3: 0.0009653691668063402
+  Max rel err k3: 0.0030252928845584393
+
+Seed: 41
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0041\50, 50\model.pth
+  Test MSE: 1.2315585991018452e-06
+  Test MSE (unscaled): 0.0
+  Current-run training time (s): 281.4188950061798
+  Cached training time (s): 281.4188950061798
+  Mean rel err k1: 0.002661044243723154
+  Max rel err k1: 0.012139509432017803
+  Mean rel err k2: 0.0007298939162865281
+  Max rel err k2: 0.003228688146919012
+  Mean rel err k3: 0.0007023836951702833
+  Max rel err k3: 0.002782976720482111
+
+Seed: 41
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0041\30, 30, 30\model.pth
+  Test MSE: 9.706794799058116e-07
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 220.6840786933899
+  Cached training time (s): 220.6840786933899
+  Mean rel err k1: 0.0018675694009289145
+  Max rel err k1: 0.010910984128713608
+  Mean rel err k2: 0.0008589280187152326
+  Max rel err k2: 0.0030334594193845987
+  Mean rel err k3: 0.0012835762463510036
+  Max rel err k3: 0.0036474724765866995
+
+Seed: 42
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0042\30, 30\model.pth
+  Test MSE: 2.601018422865309e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 218.83992505073547
+  Cached training time (s): 218.83992505073547
+  Mean rel err k1: 0.004112612456083298
+  Max rel err k1: 0.019789420068264008
+  Mean rel err k2: 0.0009985178476199508
+  Max rel err k2: 0.00527040334418416
+  Mean rel err k3: 0.0009224902605637908
+  Max rel err k3: 0.003583107376471162
+
+Seed: 42
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0042\50, 50\model.pth
+  Test MSE: 2.01855982595589e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 279.0948796272278
+  Cached training time (s): 279.0948796272278
+  Mean rel err k1: 0.0034291862975806
+  Max rel err k1: 0.014115630649030209
+  Mean rel err k2: 0.0007533442694693804
+  Max rel err k2: 0.005489783361554146
+  Mean rel err k3: 0.0008615169208496809
+  Max rel err k3: 0.0031152134761214256
+
+Seed: 42
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0042\30, 30, 30\model.pth
+  Test MSE: 1.8495248923500185e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 126.2422366142273
+  Cached training time (s): 126.2422366142273
+  Mean rel err k1: 0.0029206203762441874
+  Max rel err k1: 0.013628199696540833
+  Mean rel err k2: 0.0011656101560220122
+  Max rel err k2: 0.0038771789986640215
+  Mean rel err k3: 0.0011102905264124274
+  Max rel err k3: 0.003866769839078188
+
+Seed: 43
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0043\30, 30\model.pth
+  Test MSE: 6.447828582167858e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 85.01526546478271
+  Cached training time (s): 85.01526546478271
+  Mean rel err k1: 0.006194872781634331
+  Max rel err k1: 0.02719830349087715
+  Mean rel err k2: 0.001930016907863319
+  Max rel err k2: 0.007174908649176359
+  Mean rel err k3: 0.0010330644436180592
+  Max rel err k3: 0.003387394594028592
+
+Seed: 43
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0043\50, 50\model.pth
+  Test MSE: 7.135417035897262e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 92.49009919166565
+  Cached training time (s): 92.49009919166565
+  Mean rel err k1: 0.006841806694865227
+  Max rel err k1: 0.03685735911130905
+  Mean rel err k2: 0.001468950998969376
+  Max rel err k2: 0.00824926421046257
+  Mean rel err k3: 0.0014144161250442266
+  Max rel err k3: 0.005385615862905979
+
+Seed: 43
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0043\30, 30, 30\model.pth
+  Test MSE: 2.5718279630382312e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 125.29429030418396
+  Cached training time (s): 125.29429030418396
+  Mean rel err k1: 0.003144684247672558
+  Max rel err k1: 0.015477568842470646
+  Mean rel err k2: 0.0015058198478072882
+  Max rel err k2: 0.004747253842651844
+  Mean rel err k3: 0.001784849213436246
+  Max rel err k3: 0.006634744815528393
+
+Seed: 44
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0044\30, 30\model.pth
+  Test MSE: 6.007728643453447e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 104.70052337646484
+  Cached training time (s): 104.70052337646484
+  Mean rel err k1: 0.005677427165210247
+  Max rel err k1: 0.030907895416021347
+  Mean rel err k2: 0.0018528762739151716
+  Max rel err k2: 0.006465931888669729
+  Mean rel err k3: 0.001449322677217424
+  Max rel err k3: 0.0059945061802864075
+
+Seed: 44
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0044\50, 50\model.pth
+  Test MSE: 5.821346348966472e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 118.75568389892578
+  Cached training time (s): 118.75568389892578
+  Mean rel err k1: 0.005934212822467089
+  Max rel err k1: 0.03231089934706688
+  Mean rel err k2: 0.0018272888846695423
+  Max rel err k2: 0.0070244502276182175
+  Mean rel err k3: 0.0007664217264391482
+  Max rel err k3: 0.0038882216904312372
+
+Seed: 44
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0044\30, 30, 30\model.pth
+  Test MSE: 1.999358119064709e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 155.82789206504822
+  Cached training time (s): 155.82789206504822
+  Mean rel err k1: 0.002169943880289793
+  Max rel err k1: 0.017731932923197746
+  Mean rel err k2: 0.0014631998492404819
+  Max rel err k2: 0.008216368965804577
+  Mean rel err k3: 0.001338609610684216
+  Max rel err k3: 0.007304958533495665
+
+Seed: 45
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0045\30, 30\model.pth
+  Test MSE: 7.389881375274854e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 109.48627424240112
+  Cached training time (s): 109.48627424240112
+  Mean rel err k1: 0.0067248218692839146
+  Max rel err k1: 0.032810647040605545
+  Mean rel err k2: 0.001969131175428629
+  Max rel err k2: 0.007553701754659414
+  Mean rel err k3: 0.0015729970764368773
+  Max rel err k3: 0.006654370576143265
+
+Seed: 45
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0045\50, 50\model.pth
+  Test MSE: 2.8978747650398873e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 131.31676626205444
+  Cached training time (s): 131.31676626205444
+  Mean rel err k1: 0.003917228896170855
+  Max rel err k1: 0.01911752112209797
+  Mean rel err k2: 0.0012676417827606201
+  Max rel err k2: 0.00555641483515501
+  Mean rel err k3: 0.0009029719512909651
+  Max rel err k3: 0.002926766872406006
+
+Seed: 45
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0045\30, 30, 30\model.pth
+  Test MSE: 1.5182519064182998e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 126.50087881088257
+  Cached training time (s): 126.50087881088257
+  Mean rel err k1: 0.0025249801110476255
+  Max rel err k1: 0.011343756690621376
+  Mean rel err k2: 0.0012967361835762858
+  Max rel err k2: 0.008562943898141384
+  Mean rel err k3: 0.0013898457400500774
+  Max rel err k3: 0.004489275626838207
+
+Seed: 46
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0046\30, 30\model.pth
+  Test MSE: 5.306819275574526e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 139.87832498550415
+  Cached training time (s): 139.87832498550415
+  Mean rel err k1: 0.00582371698692441
+  Max rel err k1: 0.03225129470229149
+  Mean rel err k2: 0.001732876873575151
+  Max rel err k2: 0.008639167994260788
+  Mean rel err k3: 0.0012779447715729475
+  Max rel err k3: 0.006403598468750715
+
+Seed: 46
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0046\50, 50\model.pth
+  Test MSE: 4.946256467519561e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 150.96385407447815
+  Cached training time (s): 150.96385407447815
+  Mean rel err k1: 0.005882678087800741
+  Max rel err k1: 0.031883515417575836
+  Mean rel err k2: 0.0009002765873447061
+  Max rel err k2: 0.004038953222334385
+  Mean rel err k3: 0.0008958485559560359
+  Max rel err k3: 0.004174982197582722
+
+Seed: 46
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0046\30, 30, 30\model.pth
+  Test MSE: 1.8858964949686197e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 101.95598101615906
+  Cached training time (s): 101.95598101615906
+  Mean rel err k1: 0.002567410236224532
+  Max rel err k1: 0.01390074286609888
+  Mean rel err k2: 0.0010912949219346046
+  Max rel err k2: 0.004951493348926306
+  Mean rel err k3: 0.0017313378630205989
+  Max rel err k3: 0.00611361488699913
+
+Seed: 47
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0047\30, 30\model.pth
+  Test MSE: 1.5145582210607245e-06
+  Test MSE (unscaled): 0.0
+  Current-run training time (s): 218.9694380760193
+  Cached training time (s): 218.9694380760193
+  Mean rel err k1: 0.0030019492842257023
+  Max rel err k1: 0.015388022176921368
+  Mean rel err k2: 0.0007039434276521206
+  Max rel err k2: 0.003925047814846039
+  Mean rel err k3: 0.0008137234253808856
+  Max rel err k3: 0.004255776293575764
+
+Seed: 47
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0047\50, 50\model.pth
+  Test MSE: 3.738746954695671e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 158.07375812530518
+  Cached training time (s): 158.07375812530518
+  Mean rel err k1: 0.004483378957957029
+  Max rel err k1: 0.020288309082388878
+  Mean rel err k2: 0.0015591626288369298
+  Max rel err k2: 0.005832208786159754
+  Mean rel err k3: 0.0011479714885354042
+  Max rel err k3: 0.005079562310129404
+
+Seed: 47
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0047\30, 30, 30\model.pth
+  Test MSE: 1.2542265039883205e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 150.26014757156372
+  Cached training time (s): 150.26014757156372
+  Mean rel err k1: 0.002412418369203806
+  Max rel err k1: 0.012907651253044605
+  Mean rel err k2: 0.000998184783384204
+  Max rel err k2: 0.0031004752963781357
+  Mean rel err k3: 0.0010033083381131291
+  Max rel err k3: 0.003012478118762374
+
+Seed: 48
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0048\30, 30\model.pth
+  Test MSE: 2.1337345970096067e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 218.94620633125305
+  Cached training time (s): 218.94620633125305
+  Mean rel err k1: 0.0035501504316926003
+  Max rel err k1: 0.018985074013471603
+  Mean rel err k2: 0.0009629805572330952
+  Max rel err k2: 0.005744719412177801
+  Mean rel err k3: 0.0011760869529098272
+  Max rel err k3: 0.005007351748645306
+
+Seed: 48
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0048\50, 50\model.pth
+  Test MSE: 2.499383299436886e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 190.4226200580597
+  Cached training time (s): 190.4226200580597
+  Mean rel err k1: 0.00378999556414783
+  Max rel err k1: 0.018359215930104256
+  Mean rel err k2: 0.0007615437498316169
+  Max rel err k2: 0.004206233192235231
+  Mean rel err k3: 0.0008720037876628339
+  Max rel err k3: 0.004014103673398495
+
+Seed: 48
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0048\30, 30, 30\model.pth
+  Test MSE: 1.3038408042120864e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 157.15586233139038
+  Cached training time (s): 157.15586233139038
+  Mean rel err k1: 0.0021846857853233814
+  Max rel err k1: 0.013879830949008465
+  Mean rel err k2: 0.0011635335395112634
+  Max rel err k2: 0.007347367703914642
+  Mean rel err k3: 0.0014626741176471114
+  Max rel err k3: 0.0068081156350672245
+
+Seed: 49
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0049\30, 30\model.pth
+  Test MSE: 3.092127144554979e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 219.24377369880676
+  Cached training time (s): 219.24377369880676
+  Mean rel err k1: 0.003766793990507722
+  Max rel err k1: 0.02101723663508892
+  Mean rel err k2: 0.0016832310939207673
+  Max rel err k2: 0.006437642499804497
+  Mean rel err k3: 0.0007209376781247556
+  Max rel err k3: 0.0024375482462346554
+
+Seed: 49
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0049\50, 50\model.pth
+  Test MSE: 1.4735277318322915e-06
+  Test MSE (unscaled): 0.0
+  Current-run training time (s): 278.7748317718506
+  Cached training time (s): 278.7748317718506
+  Mean rel err k1: 0.002696467563509941
+  Max rel err k1: 0.01404550950974226
+  Mean rel err k2: 0.0007051426218822598
+  Max rel err k2: 0.005903409793972969
+  Mean rel err k3: 0.0006938579608686268
+  Max rel err k3: 0.0028419902082532644
+
+Seed: 49
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0049\30, 30, 30\model.pth
+  Test MSE: 1.6941116882662755e-06
+  Test MSE (unscaled): 0.0
+  Current-run training time (s): 175.08313655853271
+  Cached training time (s): 175.08313655853271
+  Mean rel err k1: 0.0027426155284047127
+  Max rel err k1: 0.012653899379074574
+  Mean rel err k2: 0.0012529912637546659
+  Max rel err k2: 0.004774109460413456
+  Mean rel err k3: 0.0007183717098087072
+  Max rel err k3: 0.0031654774211347103
+
+Seed: 50
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0050\30, 30\model.pth
+  Test MSE: 2.817672111632419e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 218.69062495231628
+  Cached training time (s): 218.69062495231628
+  Mean rel err k1: 0.004005437716841698
+  Max rel err k1: 0.01949639804661274
+  Mean rel err k2: 0.001146558322943747
+  Max rel err k2: 0.004434642847627401
+  Mean rel err k3: 0.0010323876049369574
+  Max rel err k3: 0.005859806668013334
+
+Seed: 50
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0050\50, 50\model.pth
+  Test MSE: 4.806968263437739e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 115.92806506156921
+  Cached training time (s): 115.92806506156921
+  Mean rel err k1: 0.005619911942631006
+  Max rel err k1: 0.028125284239649773
+  Mean rel err k2: 0.0016726725734770298
+  Max rel err k2: 0.011680434457957745
+  Mean rel err k3: 0.0011938478564843535
+  Max rel err k3: 0.004463130608201027
+
+Seed: 50
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0050\30, 30, 30\model.pth
+  Test MSE: 1.945905523825786e-06
+  Test MSE (unscaled): 1.401298464324817e-45
+  Current-run training time (s): 121.88340353965759
+  Cached training time (s): 121.88340353965759
+  Mean rel err k1: 0.0028641566168516874
+  Max rel err k1: 0.015954647213220596
+  Mean rel err k2: 0.0012221342185512185
+  Max rel err k2: 0.005500317085534334
+  Mean rel err k3: 0.0013120780931785703
+  Max rel err k3: 0.0061934152618050575
+
+Seed: 51
+Architecture: [30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0051\30, 30\model.pth
+  Test MSE: 5.793883701699087e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 93.02466416358948
+  Cached training time (s): 93.02466416358948
+  Mean rel err k1: 0.006049390882253647
+  Max rel err k1: 0.029047386720776558
+  Mean rel err k2: 0.0019253224600106478
+  Max rel err k2: 0.005994207225739956
+  Mean rel err k3: 0.0017005725530907512
+  Max rel err k3: 0.0071046738885343075
+
+Seed: 51
+Architecture: [50, 50]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0051\50, 50\model.pth
+  Test MSE: 6.287147584771446e-07
+  Test MSE (unscaled): 0.0
+  Current-run training time (s): 223.9310746192932
+  Cached training time (s): 223.9310746192932
+  Mean rel err k1: 0.0015353476628661156
+  Max rel err k1: 0.00826322939246893
+  Mean rel err k2: 0.0006912578828632832
+  Max rel err k2: 0.0030034161172807217
+  Mean rel err k3: 0.0006893968093208969
+  Max rel err k3: 0.002005997346714139
+
+Seed: 51
+Architecture: [30, 30, 30]
+  Input size: 6
+  Kept species: ['O2(a)', 'O2(b)', 'O(1D)']
+  Display species for folder: ['O2(a)', 'O2(b)', 'O(1D)']
+  Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O+(gnd)', 'O-(gnd)', 'O3(X)', 'O3(exc)']
+  Reused saved weights: False
+  Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O(1D)\seed_0051\30, 30, 30\model.pth
+  Test MSE: 1.8276282389706466e-06
+  Test MSE (unscaled): 2.802596928649634e-45
+  Current-run training time (s): 114.48744606971741
+  Cached training time (s): 114.48744606971741
+  Mean rel err k1: 0.00257827527821064
+  Max rel err k1: 0.022464292123913765
+  Mean rel err k2: 0.0014273057458922267
+  Max rel err k2: 0.004652501083910465
+  Mean rel err k3: 0.0015676722396165133
+  Max rel err k3: 0.006506411358714104

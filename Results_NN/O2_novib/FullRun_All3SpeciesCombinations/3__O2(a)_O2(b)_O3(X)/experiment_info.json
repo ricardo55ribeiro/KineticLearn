@@ -1,0 +1,107 @@
+{
+    "scheme": "O2_novib",
+    "experiment_name": "3__O2(a)_O2(b)_O3(X)",
+    "train_file": "data\\datapoints_O2_novib_mainNet_2surrog.txt",
+    "test_file": "data\\datapoints_O2_novib_mainNet_2surrog_test.txt",
+    "saved_weights_root": "saved_weights",
+    "num_pressure_conditions": 2,
+    "num_species_total": 11,
+    "num_species_kept": 3,
+    "folder_species_slots": 3,
+    "placeholder_species": "NONE",
+    "target_species_raw": [
+        "O2(a)",
+        "O2(b)",
+        "O3(X)"
+    ],
+    "display_species_for_folder": [
+        "O2(a)",
+        "O2(b)",
+        "O3(X)"
+    ],
+    "species_all": [
+        "O2(X)",
+        "O2(a)",
+        "O2(b)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(X)",
+        "O3(exc)"
+    ],
+    "kept_species": [
+        "O2(a)",
+        "O2(b)",
+        "O3(X)"
+    ],
+    "removed_species": [
+        "O2(X)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(exc)"
+    ],
+    "k_columns": [
+        0,
+        1,
+        2
+    ],
+    "architectures_tested": [
+        [
+            30,
+            30
+        ],
+        [
+            50,
+            50
+        ],
+        [
+            30,
+            30,
+            30
+        ]
+    ],
+    "seeds": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+    ],
+    "activation": "tanh",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "patience": 100,
+    "max_epochs": 5000,
+    "x_train_shape": [
+        2000,
+        6
+    ],
+    "y_train_shape": [
+        2000,
+        3
+    ],
+    "none_placeholder_note": "NONE is only used for folder/display padding. The model was trained only with kept_species.",
+    "cache_policy": "load compatible saved_weights model; otherwise train and save before evaluation"
+}

@@ -1,0 +1,62 @@
+{
+    "scheme": "O2_novib",
+    "experiment_name": "3__O2(a)_O2(b)_O3(X)",
+    "seed": 37,
+    "split_seed": 37,
+    "shuffle_seed": 37,
+    "weight_seed": 37,
+    "hidden_size": [
+        50,
+        50
+    ],
+    "depth": 2,
+    "num_parameters": 3053,
+    "input_size": 6,
+    "output_size": 3,
+    "num_pressure_conditions": 2,
+    "num_species_total": 11,
+    "num_species_kept": 3,
+    "kept_species": [
+        "O2(a)",
+        "O2(b)",
+        "O3(X)"
+    ],
+    "removed_species": [
+        "O2(X)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(exc)"
+    ],
+    "activation": "tanh",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "epochs_ran": 4218,
+    "best_epoch": 4118,
+    "final_train_loss": 2.031099001871755e-06,
+    "final_val_loss": 1.2975353456567972e-06,
+    "best_val_loss": 6.654601475020172e-07,
+    "training_time_s": 347.267982006073,
+    "cached_training_time_s": 347.267982006073,
+    "reused_saved_weights": false,
+    "saved_weights_path": "saved_weights\\O2_novib\\3__O2(a)__O2(b)__O3(X)\\seed_0037\\50, 50\\model.pth",
+    "test_mse": 5.785138910141541e-07,
+    "test_rmse": 0.000760601006450921,
+    "test_mse_unscaled": 0.0,
+    "test_rmse_unscaled": 0.0,
+    "mean_rel_error_k1": 0.0015800638357177377,
+    "max_rel_error_k1": 0.012996017932891846,
+    "mean_rel_error_k2": 0.0006328506278805435,
+    "max_rel_error_k2": 0.002835014835000038,
+    "mean_rel_error_k3": 0.0006254474865272641,
+    "max_rel_error_k3": 0.0022112794686108828,
+    "display_species_for_folder": [
+        "O2(a)",
+        "O2(b)",
+        "O3(X)"
+    ],
+    "folder_species_slots": 3
+}

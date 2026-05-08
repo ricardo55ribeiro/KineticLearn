@@ -6,6 +6,16 @@
     "scheme_saved_weights_root": "saved_weights\\O2_novib",
     "species_configs": [
         [
+            "O2(a)",
+            "O2(b)",
+            "O+(gnd)"
+        ],
+        [
+            "O2(a)",
+            "O2(b)",
+            "O2+(X)"
+        ],
+        [
             "O2(X)",
             "O2(a)",
             "O2(b)",
@@ -15,17 +25,52 @@
             "O(1D)",
             "O+(gnd)",
             "O-(gnd)",
-            "O3(X)",
-            "O3(exc)"
+            "O3(X)"
         ],
         [
             "O2(X)",
             "O2(a)",
-            "O2(b)"
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)",
+            "O(3P)",
+            "O(1D)",
+            "O+(gnd)",
+            "O-(gnd)"
         ],
         [
+            "O2(X)",
             "O2(a)",
-            "O2(b)"
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)",
+            "O(3P)",
+            "O(1D)",
+            "O+(gnd)"
+        ],
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)",
+            "O(3P)",
+            "O(1D)"
+        ],
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)",
+            "O(3P)"
+        ],
+        [
+            "O2(X)",
+            "O2(a)",
+            "O2(b)",
+            "O2(Hz)",
+            "O2+(X)"
         ]
     ],
     "architectures": [
@@ -65,10 +110,10 @@
         50,
         51
     ],
-    "num_species_configs": 3,
+    "num_species_configs": 8,
     "num_architectures": 3,
     "num_seeds": 20,
-    "num_planned_models": 180,
+    "num_planned_models": 480,
     "activation": "tanh",
     "learning_rate": 0.0001,
     "batch_size": 16,

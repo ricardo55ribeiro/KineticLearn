@@ -1,0 +1,47 @@
+workingConditions:
+  reducedField: 40                      
+  electronTemperature: 1.2              
+  excitationFrequency: 0                
+  gasPressure: 133.3220                   
+  gasTemperature: 377                   
+  wallTemperature: 323                  
+  extTemperature: 300                   
+  surfaceSiteDensity: 1e19              
+  electronDensity: 4.6E15               
+  chamberLength: 0.525                  
+  chamberRadius: 1e-2                   
+electronKinetics:
+  isOn: false             
+chemistry:
+  isOn: true
+  thermalModel:
+    isOn: false                         
+  chemFiles:
+      - O2_simple_1/O2_simple_1_0.chem
+  gasProperties: 
+    fraction:
+      - O2 = 1
+  stateProperties:
+    population:
+      - O2(X) = 1.0
+      - O(3P) = 1.0
+  iterationSchemes:
+    pressureRelError: 1e-4
+    pressureMaxIterations: 800
+    neutralityRelError: 0.01
+    neutralityMaxIterations: 1 
+    globalRelError: 1e-4
+    globalMaxIterations: 1 
+  timeIntegrationConf:
+    odeSolver: ode15s
+    steadyStateTime: 1e3
+    postDischargeTime: 0
+    odeSetParameters:                   
+gui: 
+  isOn: false
+  refreshFrequency: 1
+output: 
+  isOn: true
+  folder: O2_simple_1_0
+  dataFiles:
+    - finalDensities

@@ -1,0 +1,20 @@
+Experiment name: 3__O2(a)_O2(b)_O3(X)
+Seed: 35
+Scheme: O2_novib
+Hidden size: [50, 50]
+Input size: 6
+Kept species: ['O2(a)', 'O2(b)', 'O3(X)']
+Removed species: ['O2(X)', 'O2(Hz)', 'O2+(X)', 'O(3P)', 'O(1D)', 'O+(gnd)', 'O-(gnd)', 'O3(exc)']
+Display species for folder: ['O2(a)', 'O2(b)', 'O3(X)']
+Reused saved weights: False
+Saved weights path: saved_weights\O2_novib\3__O2(a)__O2(b)__O3(X)\seed_0035\50, 50\model.pth
+Test MSE: 9.403333365298749e-07
+Test MSE (unscaled): 0.0
+Current-run training time (s): 282.9706561565399
+Cached training time (s): 282.9706561565399
+Mean relative error k1: 0.0021074230317026377
+Max relative error k1: 0.01210200134664774
+Mean relative error k2: 0.0006637006299570203
+Max relative error k2: 0.00395872350782156
+Mean relative error k3: 0.0006720606470480561
+Max relative error k3: 0.002738164272159338
