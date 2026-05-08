@@ -1,0 +1,20 @@
+{
+    "rebuild_policy": "fullrun files rebuilt from valid first-level species-combination folders containing noise_results.csv",
+    "included_species_folders": [
+        "10__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)__O(3P)__O(1D)__O+(gnd)__O-(gnd)__O3(X)",
+        "11__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)__O(3P)__O(1D)__O+(gnd)__O-(gnd)__O3(X)__O3(exc)",
+        "2__O2(a)__O2(b)",
+        "3__O2(X)__O2(a)__O2(b)",
+        "3__O2(a)__O2(b)__O(3P)",
+        "4__O2(X)__O2(a)__O2(b)__O(3P)",
+        "5__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)",
+        "6__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)__O(3P)",
+        "7__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)__O(3P)__O(1D)",
+        "8__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)__O(3P)__O(1D)__O+(gnd)",
+        "9__O2(X)__O2(a)__O2(b)__O2(Hz)__O2+(X)__O(3P)__O(1D)__O+(gnd)__O-(gnd)"
+    ],
+    "num_included_species_folders": 11,
+    "num_fullrun_rows": 79200,
+    "num_fullrun_aggregate_rows": 198,
+    "ignored_nested_folders": true
+}

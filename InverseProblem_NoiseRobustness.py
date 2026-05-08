@@ -1059,11 +1059,6 @@ SEEDS = list(range(32, 52))
 # O(1D) / O+(gnd) / O-(gnd) /  O3(X) / O3(exc)
 SPECIES_CONFIGS = [
     ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)"],
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)"],
 ]
 
 ARCHITECTURES = [
@@ -1239,22 +1234,218 @@ def aggregate_noise_results(df):
     return agg
 
 
-def save_noise_results(noise_results_root, full_results):
+def is_valid_direct_species_results_folder(folder):
+    """Return True only for direct species-combination result folders.
+
+    Valid examples:
+        2__O2(a)__O2(b)
+        3__O2(X)__O2(a)__O2(b)
+        11__O2(X)__...__O3(exc)
+
+    Invalid examples:
+        Plots
+        outras_combinacoes
+        nao_usar_agora
+        fullrun files
+        nested folders inside nao_usar_agora
+    """
+    folder = Path(folder)
+
+    if not folder.is_dir():
+        return False
+
+    if not (folder / "noise_results.csv").exists():
+        return False
+
+    parts = folder.name.split("__")
+    if len(parts) < 2:
+        return False
+
+    try:
+        n_species_from_name = int(parts[0])
+    except ValueError:
+        return False
+
+    species_tokens = parts[1:]
+    if n_species_from_name != len(species_tokens):
+        return False
+
+    return True
+
+
+def load_direct_species_noise_results_if_valid(folder):
+    """Load a species folder only if its CSV matches the folder name."""
+    folder = Path(folder)
+
+    if not is_valid_direct_species_results_folder(folder):
+        return None
+
+    noise_results_path = folder / "noise_results.csv"
+
+    try:
+        df = pd.read_csv(noise_results_path)
+    except Exception as exc:
+        print(f"Skipping {folder.name}: could not read noise_results.csv ({exc})")
+        return None
+
+    required_cols = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "input_size",
+        "output_size",
+        "hidden_size",
+        "seed",
+        "noise_repeat",
+        "noise_std",
+        "noise_percent",
+        "noise_label",
+        "test_mse_scaled",
+    ]
+
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        print(
+            f"Skipping {folder.name}: noise_results.csv is missing columns: "
+            + ", ".join(missing_cols)
+        )
+        return None
+
+    if df.empty:
+        print(f"Skipping {folder.name}: noise_results.csv is empty.")
+        return None
+
+    species_config_names = df["species_config_name"].astype(str).dropna().unique()
+    if len(species_config_names) != 1:
+        print(
+            f"Skipping {folder.name}: expected exactly one species_config_name, "
+            f"found {len(species_config_names)}."
+        )
+        return None
+
+    species_config_name = species_config_names[0]
+    if species_config_name != folder.name:
+        print(
+            f"Skipping {folder.name}: folder name does not match species_config_name "
+            f"inside CSV ({species_config_name})."
+        )
+        return None
+
+    return df
+
+
+def rebuild_fullrun_noise_files_from_direct_species_folders(noise_results_root):
+    """Rebuild fullrun CSV files from direct species-combination folders.
+
+    Only first-level folders are used. Therefore, if a folder is moved into something
+    like 'nao_usar_agora/3__...', it is automatically ignored.
+    """
     noise_results_root = Path(noise_results_root)
     noise_results_root.mkdir(parents=True, exist_ok=True)
 
-    full_df = pd.DataFrame(full_results)
+    all_species_dfs = []
+    included_folders = []
+
+    for folder in sorted(noise_results_root.iterdir(), key=lambda p: p.name):
+        species_df = load_direct_species_noise_results_if_valid(folder)
+
+        if species_df is None:
+            continue
+
+        all_species_dfs.append(species_df)
+        included_folders.append(folder.name)
+
+    if not all_species_dfs:
+        print(
+            "No valid direct species-combination folders found. "
+            "Global fullrun files were not rebuilt."
+        )
+        return pd.DataFrame(), pd.DataFrame()
+
+    full_df = pd.concat(all_species_dfs, ignore_index=True)
+
+    # If the same species/architecture/seed/noise/repeat exists more than once,
+    # keep the last one found. In normal usage this should not happen because
+    # each species folder is overwritten when rerun.
+    duplicate_key = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "hidden_size",
+        "seed",
+        "noise_repeat",
+        "noise_std",
+    ]
+    full_df = full_df.drop_duplicates(subset=duplicate_key, keep="last")
+
+    sort_cols = [
+        "num_species_kept",
+        "species_config_name",
+        "hidden_size",
+        "seed",
+        "noise_std",
+        "noise_repeat",
+    ]
+    full_df = full_df.sort_values(sort_cols).reset_index(drop=True)
+
     full_df.to_csv(noise_results_root / "fullrun_noise_results.csv", index=False)
 
     full_agg = aggregate_noise_results(full_df)
     full_agg.to_csv(noise_results_root / "fullrun_noise_aggregate_summary.csv", index=False)
 
-    for species_name, species_df in full_df.groupby("species_config_name"):
-        species_root = noise_results_root / species_name
-        species_root.mkdir(parents=True, exist_ok=True)
-        species_df.to_csv(species_root / "noise_results.csv", index=False)
-        species_agg = aggregate_noise_results(species_df)
-        species_agg.to_csv(species_root / "noise_aggregate_summary.csv", index=False)
+    rebuild_info = {
+        "rebuild_policy": (
+            "fullrun files rebuilt from valid first-level species-combination folders "
+            "containing noise_results.csv"
+        ),
+        "included_species_folders": included_folders,
+        "num_included_species_folders": int(len(included_folders)),
+        "num_fullrun_rows": int(len(full_df)),
+        "num_fullrun_aggregate_rows": int(len(full_agg)),
+        "ignored_nested_folders": True,
+    }
+    save_json(noise_results_root / "fullrun_rebuild_info.json", rebuild_info)
+
+    print("Rebuilt global fullrun noise files from direct species folders.")
+    print(f"Included {len(included_folders)} species folder(s):")
+    for folder_name in included_folders:
+        print(f"  {folder_name}")
+
+    return full_df, full_agg
+
+
+def save_noise_results(noise_results_root, full_results):
+    """Save current-run species results, then rebuild global fullrun files from folders.
+
+    This means:
+        - the current run overwrites/updates its own species folders;
+        - fullrun_noise_results.csv is rebuilt from all valid direct species folders;
+        - fullrun_noise_aggregate_summary.csv is rebuilt from that reconstructed fullrun table.
+    """
+    noise_results_root = Path(noise_results_root)
+    noise_results_root.mkdir(parents=True, exist_ok=True)
+
+    current_df = pd.DataFrame(full_results)
+
+    if not current_df.empty:
+        for species_name, species_df in current_df.groupby("species_config_name"):
+            species_root = noise_results_root / str(species_name)
+            species_root.mkdir(parents=True, exist_ok=True)
+
+            species_df = species_df.sort_values(
+                ["hidden_size", "seed", "noise_std", "noise_repeat"]
+            ).reset_index(drop=True)
+
+            species_df.to_csv(species_root / "noise_results.csv", index=False)
+
+            species_agg = aggregate_noise_results(species_df)
+            species_agg.to_csv(species_root / "noise_aggregate_summary.csv", index=False)
+    else:
+        print("Current run produced no rows. Rebuilding global fullrun files from existing folders only.")
+
+    rebuild_fullrun_noise_files_from_direct_species_folders(noise_results_root)
 
 
 def run_noise_robustness():

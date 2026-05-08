@@ -346,6 +346,10 @@ def plot_by_architecture(df, plots_root):
     species_style = {name: style_for(i) for i, name in enumerate(all_species_configs)}
 
     for hidden_size, arch_df_all in df.groupby("hidden_size", sort=False):
+        print(f"\nArchitecture: {hidden_size}")
+        print("Number of species combinations:", arch_df_all["species_config_name"].nunique())
+        for name in arch_df_all["species_config_name"].drop_duplicates():
+            print("  ", name)
         fig, ax = plt.subplots(figsize=(10.5, 7.0))
 
         for species_config_name, species_df in arch_df_all.groupby("species_config_name", sort=False):
