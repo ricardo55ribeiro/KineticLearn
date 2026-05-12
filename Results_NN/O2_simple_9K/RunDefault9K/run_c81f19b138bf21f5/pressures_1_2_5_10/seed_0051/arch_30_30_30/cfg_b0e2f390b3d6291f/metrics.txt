@@ -1,0 +1,42 @@
+Scheme: O2_simple_9K
+Status: trained
+Config tag: cfg_b0e2f390b3d6291f
+Config signature: b0e2f390b3d6291f9d6ec32a4e91790684b2a31348d52d40d2888dddbcef1af0
+Pressures: ['1', '2', '5', '10']
+Species: ['O2(X)', 'O2(a)', 'O(3P)']
+Hidden size: [30, 30, 30]
+Activation: tanh
+Input size: 12
+Output size: 9
+Number of parameters: 2529
+Seed: 51
+Train/Val/Test: 144/36/20
+Learning rate: 0.0001
+Batch size: 16
+Max epochs: 5000
+Patience: 100
+Epochs ran: 1252
+Best epoch: 1152
+Best validation loss: 0.5428850650787354
+Final train loss: 0.4394493103027344
+Final validation loss: 0.5428850650787354
+Current run training time (s): 8.664999723434448
+Cached training time (s): 8.664999723434448
+
+Test MSE scaled: 0.39770370721817017
+Test RMSE scaled: 0.6306375402861537
+Test MSE log10: 0.026126724717334262
+Test RMSE log10: 0.1616376339759224
+Mean relative error (%): 28.319669734269382
+Max relative error (%): 347.64152422022755
+
+Per-K relative errors:
+  K1: mean=10.440871925441346 %, max=29.29133021437708 % | e + O2(X) -> e + O2(a)
+  K2: mean=41.432235309722145 %, max=253.14657720874928 % | e + O2(a) -> e + O2(X)
+  K3: mean=16.63976639314772 %, max=39.43124359601344 % | e + O2(X) -> e + 2O(3P)
+  K4: mean=33.78917889286608 %, max=131.8760394049215 % | e + O2(a) -> e + 2O(3P)
+  K5: mean=51.97630695321902 %, max=347.64152422022755 % | O2(a) + O(3P) -> O2(X) + O(3P)
+  K6: mean=17.077405056684018 %, max=56.24977729572055 % | O2(a) + O(3P) + O2(X) -> O2(X) + O(3P) + O2(X)
+  K7: mean=24.915358805471076 %, max=177.7996981195871 % | 2O(3P) + O2(X) -> 2O2(X)
+  K8: mean=41.65447171956174 %, max=214.1933025067275 % | O2(a) + wall -> O2(X)
+  K9: mean=16.9514325523113 %, max=57.51694744358002 % | O(3P) + wall -> 0.5O2(X)

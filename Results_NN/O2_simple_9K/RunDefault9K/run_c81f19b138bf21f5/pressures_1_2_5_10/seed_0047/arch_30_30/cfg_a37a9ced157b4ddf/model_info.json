@@ -1,0 +1,200 @@
+{
+  "config": {
+    "activation": "tanh",
+    "batch_size": 16,
+    "hidden_size": [
+      30,
+      30
+    ],
+    "input_size": 12,
+    "k_names": [
+      "K1",
+      "K2",
+      "K3",
+      "K4",
+      "K5",
+      "K6",
+      "K7",
+      "K8",
+      "K9"
+    ],
+    "learning_rate": 0.0001,
+    "log10_x": true,
+    "log10_y": true,
+    "max_epochs": 5000,
+    "output_size": 9,
+    "patience": 100,
+    "pressures": [
+      "1",
+      "2",
+      "5",
+      "10"
+    ],
+    "raw_table_sha256": "677e62c2575619905a55a41c6a66ac921e76d7373b296c68528cfa22e4fe624d",
+    "scheme": "O2_simple_9K",
+    "seed": 47,
+    "species": [
+      "O2(X)",
+      "O2(a)",
+      "O(3P)"
+    ],
+    "standardize_x": true,
+    "standardize_y": true,
+    "test_split": 0.1,
+    "val_split": 0.2
+  },
+  "config_signature": "a37a9ced157b4ddf38b26d0bd417115e3418d2c69c14b7d8db37abc721a52e2a",
+  "config_tag": "cfg_a37a9ced157b4ddf",
+  "dataset": {
+    "feature_names": [
+      "O2(X)@1Torr",
+      "O2(a)@1Torr",
+      "O(3P)@1Torr",
+      "O2(X)@2Torr",
+      "O2(a)@2Torr",
+      "O(3P)@2Torr",
+      "O2(X)@5Torr",
+      "O2(a)@5Torr",
+      "O(3P)@5Torr",
+      "O2(X)@10Torr",
+      "O2(a)@10Torr",
+      "O(3P)@10Torr"
+    ],
+    "k_reactions": {
+      "K1": "e + O2(X) -> e + O2(a)",
+      "K2": "e + O2(a) -> e + O2(X)",
+      "K3": "e + O2(X) -> e + 2O(3P)",
+      "K4": "e + O2(a) -> e + 2O(3P)",
+      "K5": "O2(a) + O(3P) -> O2(X) + O(3P)",
+      "K6": "O2(a) + O(3P) + O2(X) -> O2(X) + O(3P) + O2(X)",
+      "K7": "2O(3P) + O2(X) -> 2O2(X)",
+      "K8": "O2(a) + wall -> O2(X)",
+      "K9": "O(3P) + wall -> 0.5O2(X)"
+    },
+    "n_grouped_samples": 200,
+    "pressure_values_pa": [
+      133.33,
+      266.66,
+      666.66,
+      1333.3
+    ],
+    "pressures": [
+      "1",
+      "2",
+      "5",
+      "10"
+    ],
+    "raw_table_path": "C:\\Users\\ricky\\Documents\\PIC 1\\KineticLearn\\9Ks_Dataset\\O2_simple\\O2_simple_uniform_seed10_rebuilt_4p.txt",
+    "raw_table_sha256": "677e62c2575619905a55a41c6a66ac921e76d7373b296c68528cfa22e4fe624d",
+    "species": [
+      "O2(X)",
+      "O2(a)",
+      "O(3P)"
+    ],
+    "target_names": [
+      "K1",
+      "K2",
+      "K3",
+      "K4",
+      "K5",
+      "K6",
+      "K7",
+      "K8",
+      "K9"
+    ],
+    "x_raw_shape": [
+      200,
+      12
+    ],
+    "y_raw_shape": [
+      200,
+      9
+    ]
+  },
+  "files": {
+    "cache_loss_history_csv": "saved_weights\\O2_simple_9K\\pressures_1_2_5_10\\arch_30_30\\seed_0047\\cfg_a37a9ced157b4ddf\\loss_history.csv",
+    "cache_scalers_json": "saved_weights\\O2_simple_9K\\pressures_1_2_5_10\\arch_30_30\\seed_0047\\cfg_a37a9ced157b4ddf\\scalers.json",
+    "cache_split_indices_npz": "saved_weights\\O2_simple_9K\\pressures_1_2_5_10\\arch_30_30\\seed_0047\\cfg_a37a9ced157b4ddf\\split_indices.npz",
+    "loss_history_csv": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf\\loss_history.csv",
+    "metrics_json": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf\\metrics.json",
+    "metrics_txt": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf\\metrics.txt",
+    "model_cache_info_json": "saved_weights\\O2_simple_9K\\pressures_1_2_5_10\\arch_30_30\\seed_0047\\cfg_a37a9ced157b4ddf\\model_cache_info.json",
+    "model_info_json": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf\\model_info.json",
+    "model_pth": "saved_weights\\O2_simple_9K\\pressures_1_2_5_10\\arch_30_30\\seed_0047\\cfg_a37a9ced157b4ddf\\model.pth",
+    "predictions_csv": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf\\predictions.csv",
+    "predictions_npz": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf\\test_predictions.npz",
+    "results_dir": "Results_NN\\O2_simple_9K\\RunDefault9K\\run_c81f19b138bf21f5\\pressures_1_2_5_10\\seed_0047\\arch_30_30\\cfg_a37a9ced157b4ddf",
+    "saved_weights_dir": "saved_weights\\O2_simple_9K\\pressures_1_2_5_10\\arch_30_30\\seed_0047\\cfg_a37a9ced157b4ddf"
+  },
+  "metrics": {
+    "max_relative_error_percent": 346.4793316872433,
+    "max_relative_error_percent_per_k": {
+      "K1": 58.70291184889149,
+      "K2": 283.0289664921862,
+      "K3": 93.74701075773369,
+      "K4": 111.45551048507872,
+      "K5": 124.98901364467294,
+      "K6": 42.15865787366792,
+      "K7": 98.35796290076767,
+      "K8": 346.4793316872433,
+      "K9": 85.16794983279061
+    },
+    "mean_relative_error_percent": 37.0134265949333,
+    "mean_relative_error_percent_per_k": {
+      "K1": 18.172281194624137,
+      "K2": 47.17033284641511,
+      "K3": 29.454590501001874,
+      "K4": 30.86020707318791,
+      "K5": 36.64346669265179,
+      "K6": 16.884683287658895,
+      "K7": 34.04015021817609,
+      "K8": 84.89971330103788,
+      "K9": 34.995414239646024
+    },
+    "test_mse_log10": 0.031026404931917828,
+    "test_mse_scaled": 0.5267462134361267,
+    "test_rmse_log10": 0.17614313762368897,
+    "test_rmse_scaled": 0.7257728387285699
+  },
+  "model": {
+    "activation": "tanh",
+    "hidden_size": [
+      30,
+      30
+    ],
+    "input_size": 12,
+    "num_parameters": 1599,
+    "output_size": 9
+  },
+  "reused_saved_weights": true,
+  "scheme": "O2_simple_9K",
+  "script": "NeuralNet_9Ks_FullRun.py",
+  "split": {
+    "effective_test_fraction": 0.1,
+    "effective_train_fraction": 0.72,
+    "effective_val_fraction": 0.18,
+    "n_test": 20,
+    "n_train": 144,
+    "n_val": 36,
+    "seed": 47,
+    "test_split": 0.1,
+    "val_split": 0.2
+  },
+  "status": "reused",
+  "training": {
+    "batch_size": 16,
+    "best_epoch": 4992,
+    "best_train_loss": 0.26553789774576825,
+    "best_val_loss": 0.5238012671470642,
+    "cached_training_time_s": 28.549864768981934,
+    "current_run_training_time_s": 0.0,
+    "device": "cpu",
+    "epochs_ran": 5000,
+    "final_train_loss": 0.26508691906929016,
+    "final_val_loss": 0.5238012671470642,
+    "learning_rate": 0.0001,
+    "max_epochs": 5000,
+    "patience": 100,
+    "seed": 47
+  }
+}

@@ -1,0 +1,394 @@
+Architecture comparison summary
+
+Scheme: O2_simple_9K
+Experiment name: RunDefault9K
+Pressure configs: [['1', '2', '5', '10']]
+Architectures: [[30, 30]]
+Seeds: [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+Activation: tanh
+Learning rate: 0.0001
+Batch size: 16
+Max epochs: 5000
+Patience: 100
+TEST_SPLIT: 0.1
+VAL_SPLIT: 0.2 (fraction of remaining train+validation pool)
+
+Seed: 32
+Architecture: 30,30
+  Config tag: cfg_d955821268513d69
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0032\arch_30_30\cfg_d955821268513d69
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0032\cfg_d955821268513d69
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0032\cfg_d955821268513d69\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 5000
+  Best epoch: 4981
+  Best val loss: 0.46271374821662903
+  Current run training time (s): 0.0
+  Cached training time (s): 31.213632106781006
+  Test MSE scaled: 0.4034784436225891
+  Test RMSE log10: 0.1623522805133211
+  Mean relative error (%): 29.690217414059614
+  Max relative error (%): 220.93909115787497
+
+Seed: 33
+Architecture: 30,30
+  Config tag: cfg_084935fefb0cee23
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0033\arch_30_30\cfg_084935fefb0cee23
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0033\cfg_084935fefb0cee23
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0033\cfg_084935fefb0cee23\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 1929
+  Best epoch: 1829
+  Best val loss: 0.5425423383712769
+  Current run training time (s): 0.0
+  Cached training time (s): 11.277992010116577
+  Test MSE scaled: 0.6666678786277771
+  Test RMSE log10: 0.2065560919815954
+  Mean relative error (%): 43.22222415443055
+  Max relative error (%): 483.99325943420513
+
+Seed: 34
+Architecture: 30,30
+  Config tag: cfg_84a4e47d74ddc869
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0034\arch_30_30\cfg_84a4e47d74ddc869
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0034\cfg_84a4e47d74ddc869
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0034\cfg_84a4e47d74ddc869\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 1621
+  Best epoch: 1521
+  Best val loss: 0.6107308864593506
+  Current run training time (s): 0.0
+  Cached training time (s): 9.754964113235474
+  Test MSE scaled: 0.565441906452179
+  Test RMSE log10: 0.1882421288842483
+  Mean relative error (%): 38.20866820858121
+  Max relative error (%): 418.39498166867503
+
+Seed: 35
+Architecture: 30,30
+  Config tag: cfg_89fbbf9397ee1d3c
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0035\arch_30_30\cfg_89fbbf9397ee1d3c
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0035\cfg_89fbbf9397ee1d3c
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0035\cfg_89fbbf9397ee1d3c\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 2131
+  Best epoch: 2031
+  Best val loss: 0.5072240233421326
+  Current run training time (s): 0.0
+  Cached training time (s): 11.044713020324707
+  Test MSE scaled: 0.5354634523391724
+  Test RMSE log10: 0.18465951040388237
+  Mean relative error (%): 36.17537415934136
+  Max relative error (%): 353.9045861879049
+
+Seed: 36
+Architecture: 30,30
+  Config tag: cfg_11f7217e2a7ecaa5
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0036\arch_30_30\cfg_11f7217e2a7ecaa5
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0036\cfg_11f7217e2a7ecaa5
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0036\cfg_11f7217e2a7ecaa5\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 5000
+  Best epoch: 4994
+  Best val loss: 0.4406382143497467
+  Current run training time (s): 0.0
+  Cached training time (s): 28.488773345947266
+  Test MSE scaled: 0.5619164109230042
+  Test RMSE log10: 0.18624966408385268
+  Mean relative error (%): 33.0458318138798
+  Max relative error (%): 302.9290528598242
+
+Seed: 37
+Architecture: 30,30
+  Config tag: cfg_2458a4a638ae8143
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0037\arch_30_30\cfg_2458a4a638ae8143
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0037\cfg_2458a4a638ae8143
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0037\cfg_2458a4a638ae8143\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 1853
+  Best epoch: 1753
+  Best val loss: 0.5177894830703735
+  Current run training time (s): 0.0
+  Cached training time (s): 9.871838569641113
+  Test MSE scaled: 0.46330028772354126
+  Test RMSE log10: 0.1748293933986787
+  Mean relative error (%): 32.79268553363344
+  Max relative error (%): 218.3429540396912
+
+Seed: 38
+Architecture: 30,30
+  Config tag: cfg_0ae32182ce697091
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0038\arch_30_30\cfg_0ae32182ce697091
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0038\cfg_0ae32182ce697091
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0038\cfg_0ae32182ce697091\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 2658
+  Best epoch: 2558
+  Best val loss: 0.5347055792808533
+  Current run training time (s): 0.0
+  Cached training time (s): 14.44340181350708
+  Test MSE scaled: 0.5437094569206238
+  Test RMSE log10: 0.18592433644989395
+  Mean relative error (%): 38.459718022292904
+  Max relative error (%): 319.7321165238717
+
+Seed: 39
+Architecture: 30,30
+  Config tag: cfg_387e61417540edb4
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0039\arch_30_30\cfg_387e61417540edb4
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0039\cfg_387e61417540edb4
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0039\cfg_387e61417540edb4\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 4251
+  Best epoch: 4151
+  Best val loss: 0.5275219678878784
+  Current run training time (s): 0.0
+  Cached training time (s): 24.328943490982056
+  Test MSE scaled: 0.43523162603378296
+  Test RMSE log10: 0.16747461630595178
+  Mean relative error (%): 34.04325606063278
+  Max relative error (%): 203.94957561907376
+
+Seed: 40
+Architecture: 30,30
+  Config tag: cfg_7950e69f110bf23f
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0040\arch_30_30\cfg_7950e69f110bf23f
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0040\cfg_7950e69f110bf23f
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0040\cfg_7950e69f110bf23f\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 2164
+  Best epoch: 2064
+  Best val loss: 0.5305514931678772
+  Current run training time (s): 0.0
+  Cached training time (s): 14.967376470565796
+  Test MSE scaled: 0.531886875629425
+  Test RMSE log10: 0.18307978522642554
+  Mean relative error (%): 38.06355670180423
+  Max relative error (%): 347.5296214441744
+
+Seed: 41
+Architecture: 30,30
+  Config tag: cfg_2eacc1b2169411f3
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0041\arch_30_30\cfg_2eacc1b2169411f3
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0041\cfg_2eacc1b2169411f3
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0041\cfg_2eacc1b2169411f3\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 5000
+  Best epoch: 4974
+  Best val loss: 0.4733152389526367
+  Current run training time (s): 0.0
+  Cached training time (s): 29.559009790420532
+  Test MSE scaled: 0.4088236093521118
+  Test RMSE log10: 0.16010783821902
+  Mean relative error (%): 29.054426605337092
+  Max relative error (%): 402.506992574716
+
+Seed: 42
+Architecture: 30,30
+  Config tag: cfg_f40f3c2b840a9417
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0042\arch_30_30\cfg_f40f3c2b840a9417
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0042\cfg_f40f3c2b840a9417
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0042\cfg_f40f3c2b840a9417\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 387
+  Best epoch: 287
+  Best val loss: 0.5999135375022888
+  Current run training time (s): 0.0
+  Cached training time (s): 2.088005781173706
+  Test MSE scaled: 0.5525991916656494
+  Test RMSE log10: 0.19049028803840806
+  Mean relative error (%): 36.91951775793267
+  Max relative error (%): 318.25734072765783
+
+Seed: 43
+Architecture: 30,30
+  Config tag: cfg_20fbe733f1762f98
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0043\arch_30_30\cfg_20fbe733f1762f98
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0043\cfg_20fbe733f1762f98
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0043\cfg_20fbe733f1762f98\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 2125
+  Best epoch: 2025
+  Best val loss: 0.46596139669418335
+  Current run training time (s): 0.0
+  Cached training time (s): 11.879311561584473
+  Test MSE scaled: 0.5986295938491821
+  Test RMSE log10: 0.19596154410827407
+  Mean relative error (%): 41.23011815403562
+  Max relative error (%): 306.0429620729581
+
+Seed: 44
+Architecture: 30,30
+  Config tag: cfg_5b044f6cf91b371f
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0044\arch_30_30\cfg_5b044f6cf91b371f
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0044\cfg_5b044f6cf91b371f
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0044\cfg_5b044f6cf91b371f\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 2221
+  Best epoch: 2121
+  Best val loss: 0.502189040184021
+  Current run training time (s): 0.0
+  Cached training time (s): 12.346901416778564
+  Test MSE scaled: 0.44105789065361023
+  Test RMSE log10: 0.17067787697674325
+  Mean relative error (%): 31.514049296970256
+  Max relative error (%): 364.48723873339225
+
+Seed: 45
+Architecture: 30,30
+  Config tag: cfg_32713c780f0faf0d
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0045\arch_30_30\cfg_32713c780f0faf0d
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0045\cfg_32713c780f0faf0d
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0045\cfg_32713c780f0faf0d\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 2011
+  Best epoch: 1911
+  Best val loss: 0.40757375955581665
+  Current run training time (s): 0.0
+  Cached training time (s): 11.47329044342041
+  Test MSE scaled: 0.4409549832344055
+  Test RMSE log10: 0.1714757578111512
+  Mean relative error (%): 32.68956115019224
+  Max relative error (%): 393.57221369952924
+
+Seed: 46
+Architecture: 30,30
+  Config tag: cfg_f76b80ee9d5c667f
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0046\arch_30_30\cfg_f76b80ee9d5c667f
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0046\cfg_f76b80ee9d5c667f
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0046\cfg_f76b80ee9d5c667f\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 3845
+  Best epoch: 3745
+  Best val loss: 0.5047598481178284
+  Current run training time (s): 0.0
+  Cached training time (s): 22.148313999176025
+  Test MSE scaled: 0.5189749002456665
+  Test RMSE log10: 0.18353433737330901
+  Mean relative error (%): 34.140212940544735
+  Max relative error (%): 314.2612596188882
+
+Seed: 47
+Architecture: 30,30
+  Config tag: cfg_a37a9ced157b4ddf
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0047\arch_30_30\cfg_a37a9ced157b4ddf
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0047\cfg_a37a9ced157b4ddf
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0047\cfg_a37a9ced157b4ddf\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 5000
+  Best epoch: 4992
+  Best val loss: 0.5238012671470642
+  Current run training time (s): 0.0
+  Cached training time (s): 28.549864768981934
+  Test MSE scaled: 0.5267462134361267
+  Test RMSE log10: 0.17614313762368897
+  Mean relative error (%): 37.0134265949333
+  Max relative error (%): 346.4793316872433
+
+Seed: 48
+Architecture: 30,30
+  Config tag: cfg_d198f4ada6e50f7d
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0048\arch_30_30\cfg_d198f4ada6e50f7d
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0048\cfg_d198f4ada6e50f7d
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0048\cfg_d198f4ada6e50f7d\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 3020
+  Best epoch: 2920
+  Best val loss: 0.5017110705375671
+  Current run training time (s): 0.0
+  Cached training time (s): 17.145954370498657
+  Test MSE scaled: 0.5586056709289551
+  Test RMSE log10: 0.1885307162360107
+  Mean relative error (%): 37.112477238302645
+  Max relative error (%): 387.78908252936833
+
+Seed: 49
+Architecture: 30,30
+  Config tag: cfg_f6d63d28032cd7e4
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0049\arch_30_30\cfg_f6d63d28032cd7e4
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0049\cfg_f6d63d28032cd7e4
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0049\cfg_f6d63d28032cd7e4\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 3677
+  Best epoch: 3577
+  Best val loss: 0.4396030306816101
+  Current run training time (s): 0.0
+  Cached training time (s): 23.99683690071106
+  Test MSE scaled: 0.37463316321372986
+  Test RMSE log10: 0.15796957002670664
+  Mean relative error (%): 27.394229472584307
+  Max relative error (%): 174.18560206628854
+
+Seed: 50
+Architecture: 30,30
+  Config tag: cfg_4cc1464bad7cfd55
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0050\arch_30_30\cfg_4cc1464bad7cfd55
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0050\cfg_4cc1464bad7cfd55
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0050\cfg_4cc1464bad7cfd55\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 891
+  Best epoch: 791
+  Best val loss: 0.49878183007240295
+  Current run training time (s): 0.0
+  Cached training time (s): 4.804487466812134
+  Test MSE scaled: 0.5382223725318909
+  Test RMSE log10: 0.1845734128077253
+  Mean relative error (%): 36.606068630625046
+  Max relative error (%): 353.81422840366844
+
+Seed: 51
+Architecture: 30,30
+  Config tag: cfg_c2fd27bb073c9c69
+  Pressures: 1,2,5,10
+  Status: reused
+  Results dir: Results_NN\O2_simple_9K\RunDefault9K\run_4b25ff7baacf203d\pressures_1_2_5_10\seed_0051\arch_30_30\cfg_c2fd27bb073c9c69
+  Saved weights dir: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0051\cfg_c2fd27bb073c9c69
+  Saved weights: saved_weights\O2_simple_9K\pressures_1_2_5_10\arch_30_30\seed_0051\cfg_c2fd27bb073c9c69\model.pth
+  Train/Val/Test: 144/36/20
+  Epochs ran: 1563
+  Best epoch: 1463
+  Best val loss: 0.5513591170310974
+  Current run training time (s): 0.0
+  Cached training time (s): 9.03540587425232
+  Test MSE scaled: 0.3907413184642792
+  Test RMSE log10: 0.16008285210486067
+  Mean relative error (%): 28.386564485052826
+  Max relative error (%): 334.95139158010454

@@ -1,0 +1,58 @@
+***********************************
+* Particle balance for O2 species *
+***********************************
+
+-> Particle balance for O2(X):
+    * Reactions where O2(X) is created:
+                                                     Rate(m^-3s^-1)       Contribution
+      e + O2(a) -> e + O2(X)                         7.79348426374965e+22 8.65562487406388e-01%
+      O2(a) + O(3P) -> O2(X) + O(3P)                 5.37733067084072e+23 5.97218850201436e+00%
+      O2(a) + O(3P) + O2(X) -> O2(X) + O(3P) + O2(X) 1.25963158161028e+24 1.39897612941309e+01%
+      2O(3P) + O2(X) -> O2(X) + O2(X)                2.80608989122029e+24 3.11650869358652e+01%
+      O2(a) + Wall -> O2(X)                          1.99176870528721e+23 2.21210464606383e+00%
+      O(3P) + Wall -> 5.000000e-01O2(X)              4.12338710342655e+24 4.57952961345193e+01%
+                                               TOTAL 9.00395335650741e+24 1.00000000000000e+02%
+    * Reactions where O2(X) is destroyed:
+                                                     Rate(m^-3s^-1)       Contribution
+      e + O2(X) -> e + O2(a)                         2.43886577557208e+24 2.70866105032568e+01%
+      e + O2(X) -> e + 2O(3P)                        6.56508758093533e+24 7.29133894967432e+01%
+                                               TOTAL 9.00395335650741e+24 1.00000000000000e+02%
+
+    * Relative O2(X) balance (creation-destruction)/creation: 2.38504528285673e-14%
+
+-> Particle balance for O2(a):
+    * Reactions where O2(a) is created:
+                                                     Rate(m^-3s^-1)       Contribution
+      e + O2(X) -> e + O2(a)                         2.43886577557208e+24 1.00000000000000e+02%
+                                               TOTAL 2.43886577557208e+24 1.00000000000000e+02%
+    * Reactions where O2(a) is destroyed:
+                                                     Rate(m^-3s^-1)       Contribution
+      e + O2(a) -> e + O2(X)                         7.79348426374965e+22 3.19553636030731e+00%
+      e + O2(a) -> e + 2O(3P)                        3.64389413711510e+23 1.49409376014568e+01%
+      O2(a) + O(3P) -> O2(X) + O(3P)                 5.37733067084072e+23 2.20484896081638e+01%
+      O2(a) + O(3P) + O2(X) -> O2(X) + O(3P) + O2(X) 1.25963158161028e+24 5.16482536360497e+01%
+      O2(a) + Wall -> O2(X)                          1.99176870528721e+23 8.16678279402238e+00%
+                                               TOTAL 2.43886577557208e+24 1.00000000000000e+02%
+
+    * Relative O2(a) balance (creation-destruction)/creation: 2.20131389507923e-14%
+
+
+**********************************
+* Particle balance for O species *
+**********************************
+
+-> Particle balance for O(3P):
+    * Reactions where O(3P) is created:
+                                                     Rate(m^-3s^-1)       Contribution
+      e + O2(X) -> e + 2O(3P)                        1.31301751618707e+25 9.47414586412076e+01%
+      e + O2(a) -> e + 2O(3P)                        7.28778827423020e+23 5.25854135879242e+00%
+                                               TOTAL 1.38589539892937e+25 1.00000000000000e+02%
+    * Reactions where O(3P) is destroyed:
+                                                     Rate(m^-3s^-1)       Contribution
+      2O(3P) + O2(X) -> O2(X) + O2(X)                5.61217978244058e+24 4.04949737676891e+01%
+      O(3P) + Wall -> 5.000000e-01O2(X)              8.24677420685311e+24 5.95050262323109e+01%
+                                               TOTAL 1.38589539892937e+25 1.00000000000000e+02%
+
+    * Relative O(3P) balance (creation-destruction)/creation: -3.09905588785268e-14%
+
+
