@@ -1,0 +1,63 @@
+{
+    "scheme": "O2_novib",
+    "train_file": "data\\datapoints_O2_novib_mainNet_2surrog.txt",
+    "test_file": "data\\datapoints_O2_novib_mainNet_2surrog_test.txt",
+    "k_columns": [
+        0,
+        1,
+        2
+    ],
+    "num_pressure_conditions": 2,
+    "num_species_total": 11,
+    "num_species_kept": 2,
+    "species_all": [
+        "O2(X)",
+        "O2(a)",
+        "O2(b)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(X)",
+        "O3(exc)"
+    ],
+    "kept_species": [
+        "O2(X)",
+        "O2(a)"
+    ],
+    "removed_species": [
+        "O2(b)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(3P)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(X)",
+        "O3(exc)"
+    ],
+    "feature_names": [
+        "O2(X)_p1",
+        "O2(a)_p1",
+        "O2(X)_p2",
+        "O2(a)_p2"
+    ],
+    "x_train_shape": [
+        2000,
+        4
+    ],
+    "y_train_shape": [
+        2000,
+        3
+    ],
+    "x_test_shape": [
+        100,
+        4
+    ],
+    "y_test_shape": [
+        100,
+        3
+    ]
+}

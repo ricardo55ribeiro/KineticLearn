@@ -1058,7 +1058,7 @@ SEEDS = list(range(32, 52))
 # O2(X) /  O2(a)  /  O2(b)  / O2(Hz) / O2+(X) / O(3P)
 # O(1D) / O+(gnd) / O-(gnd) /  O3(X) / O3(exc)
 SPECIES_CONFIGS = [
-    ["O2(X)", "O2(a)", "O2(b)", "O2(Hz)", "O2+(X)", "O(3P)", "O(1D)", "O+(gnd)", "O-(gnd)", "O3(X)"],
+    ["O2(X)", "O2(a)", "O2(b)"],
 ]
 
 ARCHITECTURES = [
@@ -1077,6 +1077,58 @@ VERBOSE_EPOCH_LOSSES = False
 
 RESAMPLE_NEGATIVE_DENSITIES = True
 MAX_NOISE_RESAMPLE_ATTEMPTS = 1000
+CLIP_NEGATIVE_DENSITIES = False
+
+# Optional post-processing stages. These run only after the noise CSV files are safely saved.
+SAVE_NOISE_PLOTS_AFTER_RUN = True
+EXPORT_REAL_K_PREDICTIONS_AFTER_RUN = True
+
+# --------------------------------------------------------------------------------------
+# Noise-plot options
+
+NOISE_RESULTS_TIMESTAMP = None  # None -> use Noise_MSE_Results directly, or latest timestamped subfolder if present.
+PLOT_MAIN_METRIC = "test_mse_scaled"
+PLOT_MAIN_METRIC_LABEL = "Scaled MSE"
+PLOT_USE_LOG_Y = True
+PLOT_SAVE_PNG = True
+PLOT_SAVE_PDF = True
+PLOT_DPI = 300
+PLOT_COLORS = ["green", "red", "blue"]
+PLOT_MARKERS = ["o", "s", "^", "D", "v", "P", "X", "<", ">", "*"]
+PLOT_MAX_LEGEND_COLUMNS = 2
+
+# --------------------------------------------------------------------------------------
+# Real-K export options
+
+# If None, export all valid direct species folders found in Noise_MSE_Results.
+# Otherwise, list folder names such as ["3__O2(X)__O2(a)__O2(b)"].
+SPECIES_CONFIG_NAMES_TO_EXPORT = [species_config_to_name(["O2(X)", "O2(a)", "O2(b)"])]
+
+# If None, export all architectures/noise levels/seeds/noise repeats found in noise_results.csv.
+ARCHITECTURES_TO_EXPORT = None      # e.g. ["30, 30", "50, 50"]
+NOISE_PERCENTS_TO_EXPORT = None     # e.g. [0.0, 1.0, 10.0]
+SEEDS_TO_EXPORT = None              # e.g. [32, 33]
+NOISE_REPEATS_TO_EXPORT = None      # e.g. [0, 1, 2]
+
+SAVE_REAL_K_RAW_CSV = True
+SAVE_REAL_K_AGGREGATE_CSV = True
+SAVE_REAL_K_FULL_TEXT_TABLE = True
+SAVE_REAL_K_EXAMPLES_REPORT = False
+SAVE_REAL_K_GLOBAL_RAW_CSV = True
+SAVE_REAL_K_GLOBAL_AGGREGATE_CSV = True
+SAVE_REAL_K_SIMPLE_TABLES = False  # Removed/replaced by Real_Ks_Distilled outputs.
+SAVE_REAL_K_DISTILLED_TABLES = True
+
+# The full TXT table is usually most useful from the aggregate table. Set to "raw" only if needed.
+REAL_K_FULL_TEXT_TABLE_SOURCE = "aggregate"  # "aggregate" or "raw"
+REAL_K_REPORT_NOISE_PERCENTS = [0.0, 1.0, 10.0]
+REAL_K_REPORT_INCLUDE_BEST_MEDIAN_WORST = True
+
+# Distilled professor-facing tables: use None for all noise levels, or a list like [0.0, 1.0, 10.0].
+REAL_K_DISTILLED_NOISE_PERCENTS = [0.0, 1.0, 10.0]
+REAL_K_FLOAT_FORMAT = "{:.6e}"
+REAL_K_PERCENT_FORMAT = "{:.3f}"
+REAL_K_TXT_BLOCK_SEPARATOR_EVERY = 80
 
 
 # --------------------------------------------------------------------------------------
@@ -1088,6 +1140,7 @@ def noise_label(noise_std):
 
 def make_noisy_inputs_unscaled(x_clean_unscaled, noise_std, rng):
     x_clean_unscaled = np.asarray(x_clean_unscaled, dtype=np.float64)
+    noise_std = float(noise_std)
 
     if noise_std == 0.0:
         return x_clean_unscaled.copy()
@@ -1120,6 +1173,9 @@ def make_noisy_inputs_unscaled(x_clean_unscaled, noise_std, rng):
 
             x_noisy[negative_mask] = x_clean_unscaled[negative_mask] * (1.0 + new_noise)
             negative_mask = x_noisy < 0.0
+
+    elif CLIP_NEGATIVE_DENSITIES:
+        x_noisy = np.clip(x_noisy, 0.0, None)
 
     return x_noisy
 
@@ -1469,6 +1525,9 @@ def run_noise_robustness():
         "noise_type": "multiplicative Gaussian noise applied to all selected unscaled input-density features",
         "resample_negative_densities": RESAMPLE_NEGATIVE_DENSITIES,
         "max_noise_resample_attempts": MAX_NOISE_RESAMPLE_ATTEMPTS,
+        "clip_negative_densities": CLIP_NEGATIVE_DENSITIES,
+        "save_noise_plots_after_run": SAVE_NOISE_PLOTS_AFTER_RUN,
+        "export_real_k_predictions_after_run": EXPORT_REAL_K_PREDICTIONS_AFTER_RUN,
         "cache_policy": "load compatible saved_weights model; otherwise train and save before evaluation",
     }
     save_json(noise_results_root / "noise_run_info.json", run_info)
@@ -1529,6 +1588,1542 @@ def run_noise_robustness():
 
     save_noise_results(noise_results_root, full_results)
     print(f"Saved noise robustness results to: {noise_results_root}")
+
+    if SAVE_NOISE_PLOTS_AFTER_RUN:
+        try:
+            save_noise_robustness_plots(noise_results_root)
+        except Exception as exc:
+            print(f"WARNING: Noise plotting failed after results were saved: {exc}")
+
+    if EXPORT_REAL_K_PREDICTIONS_AFTER_RUN:
+        try:
+            export_real_k_predictions(noise_results_root)
+        except Exception as exc:
+            print(f"WARNING: Real-K export failed after results were saved: {exc}")
+
+
+# ======================================================================================
+# Optional post-processing: noise robustness plots
+# ======================================================================================
+
+
+def plot_safe_path_token(text):
+    return (
+        str(text)
+        .replace("/", "-")
+        .replace("\\", "-")
+        .replace(":", "-")
+        .replace("*", "")
+        .replace("?", "")
+        .replace('"', "")
+        .replace("<", "")
+        .replace(">", "")
+        .replace("|", "")
+        .replace(" ", "")
+        .replace(",", "_")
+    )
+
+
+def has_noise_results(folder):
+    folder = Path(folder)
+    return (
+        (folder / "fullrun_noise_aggregate_summary.csv").exists()
+        or (folder / "fullrun_noise_results.csv").exists()
+    )
+
+
+def resolve_noise_results_root(noise_results_root=None):
+    parent = Path(noise_results_root) if noise_results_root is not None else BASE_RESULTS_DIR / SCHEME / EXPERIMENT_NAME / "Noise_MSE_Results"
+
+    if not parent.exists():
+        raise FileNotFoundError(
+            f"Noise results folder does not exist:\n{parent}\n"
+            "Run the noise robustness workflow first."
+        )
+
+    if NOISE_RESULTS_TIMESTAMP is not None:
+        root = parent / NOISE_RESULTS_TIMESTAMP
+        if not has_noise_results(root):
+            raise FileNotFoundError(
+                f"Could not find fullrun_noise_aggregate_summary.csv or "
+                f"fullrun_noise_results.csv in:\n{root}"
+            )
+        return root
+
+    if has_noise_results(parent):
+        return parent
+
+    candidate_roots = [p for p in parent.iterdir() if p.is_dir() and has_noise_results(p)]
+    if not candidate_roots:
+        raise FileNotFoundError(
+            f"Could not find fullrun_noise_aggregate_summary.csv or "
+            f"fullrun_noise_results.csv in:\n{parent}\n"
+            "Also checked timestamped subfolders."
+        )
+
+    return sorted(candidate_roots, key=lambda p: p.name)[-1]
+
+
+def flatten_noise_aggregate_if_needed(df):
+    if f"{PLOT_MAIN_METRIC}_mean" in df.columns:
+        return df
+
+    if PLOT_MAIN_METRIC in df.columns:
+        group_cols = [
+            "scheme",
+            "experiment_name",
+            "species_config_name",
+            "kept_species",
+            "num_species_kept",
+            "input_size",
+            "output_size",
+            "hidden_size",
+            "noise_std",
+            "noise_percent",
+            "noise_label",
+        ]
+        missing_group_cols = [col for col in group_cols if col not in df.columns]
+        if missing_group_cols:
+            raise ValueError(
+                "Raw results table is missing required grouping columns: "
+                + ", ".join(missing_group_cols)
+            )
+
+        metric_cols = [col for col in df.columns if col.endswith("_scaled")]
+        agg_dict = {col: ["mean", "std", "min", "max"] for col in metric_cols}
+        agg = df.groupby(group_cols, as_index=False).agg(agg_dict)
+        agg.columns = [
+            col if isinstance(col, str) else "_".join([c for c in col if c])
+            for col in agg.columns.to_flat_index()
+        ]
+        return agg
+
+    raise ValueError(
+        f"Could not find either {PLOT_MAIN_METRIC!r} or "
+        f"{PLOT_MAIN_METRIC + '_mean'!r} in the table."
+    )
+
+
+def load_noise_aggregate_table(results_root):
+    results_root = Path(results_root)
+    agg_path = results_root / "fullrun_noise_aggregate_summary.csv"
+    raw_path = results_root / "fullrun_noise_results.csv"
+
+    if agg_path.exists():
+        df = pd.read_csv(agg_path)
+    elif raw_path.exists():
+        df = pd.read_csv(raw_path)
+    else:
+        raise FileNotFoundError(
+            f"Could not find aggregate or raw noise results in:\n{results_root}"
+        )
+
+    df = flatten_noise_aggregate_if_needed(df)
+
+    required_cols = [
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "hidden_size",
+        "noise_percent",
+        f"{PLOT_MAIN_METRIC}_mean",
+    ]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError("Missing required columns: " + ", ".join(missing_cols))
+
+    df = df.sort_values(
+        ["num_species_kept", "species_config_name", "hidden_size", "noise_percent"]
+    ).reset_index(drop=True)
+    return df
+
+
+def plot_metric_columns(metric):
+    return (
+        f"{metric}_mean",
+        f"{metric}_std",
+        f"{metric}_min",
+        f"{metric}_max",
+    )
+
+
+def get_plot_metric_values(df, metric):
+    mean_col, std_col, _, _ = plot_metric_columns(metric)
+    if mean_col not in df.columns:
+        raise ValueError(f"Missing required column: {mean_col}")
+
+    y = df[mean_col].to_numpy(dtype=float)
+
+    if std_col in df.columns:
+        yerr = df[std_col].fillna(0.0).to_numpy(dtype=float)
+    else:
+        yerr = np.zeros_like(y)
+
+    return y, yerr
+
+
+def short_species_label(row_or_df):
+    if isinstance(row_or_df, pd.DataFrame):
+        species = str(row_or_df["kept_species"].iloc[0])
+    else:
+        species = str(row_or_df["kept_species"])
+
+    species = (
+        species.replace("[", "")
+        .replace("]", "")
+        .replace("'", "")
+        .replace('"', "")
+    )
+    species = ", ".join(part.strip() for part in species.split(",") if part.strip())
+    return species
+
+
+def ordered_unique(series):
+    return list(dict.fromkeys(series.tolist()))
+
+
+def plot_style_for(index):
+    return {
+        "color": PLOT_COLORS[index % len(PLOT_COLORS)],
+        "marker": PLOT_MARKERS[index % len(PLOT_MARKERS)],
+    }
+
+
+def save_current_noise_figure(plt, output_base):
+    output_base = Path(output_base)
+    output_base.parent.mkdir(parents=True, exist_ok=True)
+    if PLOT_SAVE_PDF:
+        plt.savefig(output_base.with_suffix(".pdf"), bbox_inches="tight")
+    if PLOT_SAVE_PNG:
+        plt.savefig(output_base.with_suffix(".png"), dpi=PLOT_DPI, bbox_inches="tight")
+    plt.close()
+
+
+def format_noise_axes(ax):
+    ax.set_xlabel("Gaussian noise level on input densities (%)", fontsize=13)
+    ax.set_ylabel(PLOT_MAIN_METRIC_LABEL, fontsize=13)
+    if PLOT_USE_LOG_Y:
+        ax.set_yscale("log")
+    ax.grid(True, which="both", alpha=0.25)
+
+
+def set_two_line_title(ax, first_line, second_line):
+    ax.set_title(f"{first_line}\n{second_line}", fontsize=13)
+
+
+def plot_noise_by_species(df, plots_root):
+    import matplotlib.pyplot as plt
+
+    output_root = Path(plots_root) / "by_species"
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    all_architectures = ordered_unique(df["hidden_size"])
+    architecture_style = {arch: plot_style_for(i) for i, arch in enumerate(all_architectures)}
+
+    for species_config_name, species_df in df.groupby("species_config_name", sort=False):
+        species_label = short_species_label(species_df)
+        species_dir = output_root / plot_safe_path_token(species_config_name)
+        species_dir.mkdir(parents=True, exist_ok=True)
+
+        fig, ax = plt.subplots(figsize=(9.5, 6.5))
+
+        for hidden_size, arch_df in species_df.groupby("hidden_size", sort=False):
+            arch_df = arch_df.sort_values("noise_percent")
+            x = arch_df["noise_percent"].to_numpy(dtype=float)
+            y, yerr = get_plot_metric_values(arch_df, PLOT_MAIN_METRIC)
+            style = architecture_style[hidden_size]
+
+            ax.errorbar(
+                x,
+                y,
+                yerr=yerr,
+                marker=style["marker"],
+                color=style["color"],
+                linewidth=1.8,
+                capsize=4,
+                label=f"{hidden_size}",
+            )
+
+        set_two_line_title(
+            ax,
+            "Inverse noise robustness by architecture",
+            f"Species: {species_label}",
+        )
+        ax.set_xticks(sorted(species_df["noise_percent"].unique()))
+        format_noise_axes(ax)
+        ax.legend(title="Architecture", fontsize=10, title_fontsize=10, frameon=False)
+        fig.tight_layout()
+
+        save_current_noise_figure(plt, species_dir / "all_architectures")
+
+        for hidden_size, arch_df in species_df.groupby("hidden_size", sort=False):
+            arch_df = arch_df.sort_values("noise_percent")
+            x = arch_df["noise_percent"].to_numpy(dtype=float)
+            y, yerr = get_plot_metric_values(arch_df, PLOT_MAIN_METRIC)
+            style = architecture_style[hidden_size]
+
+            fig, ax = plt.subplots(figsize=(8.5, 6.0))
+            ax.errorbar(
+                x,
+                y,
+                yerr=yerr,
+                marker=style["marker"],
+                color=style["color"],
+                linewidth=1.9,
+                capsize=4,
+                label=f"Architecture: {hidden_size}",
+            )
+
+            set_two_line_title(
+                ax,
+                f"Inverse noise robustness | Architecture: {hidden_size}",
+                f"Species: {species_label}",
+            )
+            ax.set_xticks(sorted(arch_df["noise_percent"].unique()))
+            format_noise_axes(ax)
+            ax.legend(fontsize=10, frameon=False)
+            fig.tight_layout()
+
+            output_name = f"architecture_{plot_safe_path_token(hidden_size)}"
+            save_current_noise_figure(plt, species_dir / output_name)
+
+
+def plot_noise_by_architecture(df, plots_root):
+    import matplotlib.pyplot as plt
+
+    output_dir = Path(plots_root) / "by_architecture"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    all_species_configs = ordered_unique(df["species_config_name"])
+    species_style = {name: plot_style_for(i) for i, name in enumerate(all_species_configs)}
+
+    for hidden_size, arch_df_all in df.groupby("hidden_size", sort=False):
+        print(f"\nArchitecture: {hidden_size}")
+        print("Number of species combinations:", arch_df_all["species_config_name"].nunique())
+        for name in arch_df_all["species_config_name"].drop_duplicates():
+            print("  ", name)
+
+        fig, ax = plt.subplots(figsize=(10.5, 7.4))
+
+        for species_config_name, species_df in arch_df_all.groupby("species_config_name", sort=False):
+            species_df = species_df.sort_values("noise_percent")
+            x = species_df["noise_percent"].to_numpy(dtype=float)
+            y, yerr = get_plot_metric_values(species_df, PLOT_MAIN_METRIC)
+            species_label = short_species_label(species_df)
+            style = species_style[species_config_name]
+
+            ax.errorbar(
+                x,
+                y,
+                yerr=yerr,
+                marker=style["marker"],
+                color=style["color"],
+                linewidth=1.6,
+                capsize=4,
+                label=species_label,
+            )
+
+        set_two_line_title(
+            ax,
+            "Inverse noise robustness by species configuration",
+            f"Architecture: {hidden_size}",
+        )
+        ax.set_xticks(sorted(arch_df_all["noise_percent"].unique()))
+        format_noise_axes(ax)
+        ax.legend(
+            title="Input species",
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.19),
+            fontsize=8,
+            title_fontsize=9,
+            frameon=False,
+            ncol=PLOT_MAX_LEGEND_COLUMNS,
+            handlelength=2.0,
+            columnspacing=1.0,
+            labelspacing=0.45,
+            borderaxespad=0.0,
+        )
+        fig.tight_layout()
+        fig.subplots_adjust(bottom=0.32)
+
+        output_base = output_dir / f"architecture_{plot_safe_path_token(hidden_size)}__species_configs"
+        save_current_noise_figure(plt, output_base)
+
+
+def save_noise_plot_manifest(results_root, plots_root, df):
+    manifest = {
+        "results_root": str(results_root),
+        "plots_root": str(plots_root),
+        "main_metric": PLOT_MAIN_METRIC,
+        "main_metric_label": PLOT_MAIN_METRIC_LABEL,
+        "use_log_y": PLOT_USE_LOG_Y,
+        "plot_colours": PLOT_COLORS,
+        "created_folders": ["by_species", "by_architecture"],
+        "overview_folder_created": False,
+        "num_species_configurations": int(df["species_config_name"].nunique()),
+        "num_architectures": int(df["hidden_size"].nunique()),
+        "noise_percent_values": sorted(float(x) for x in df["noise_percent"].unique()),
+    }
+    pd.Series(manifest).to_json(Path(plots_root) / "plot_manifest.json", indent=4)
+
+
+def save_noise_robustness_plots(noise_results_root=None):
+    results_root = resolve_noise_results_root(noise_results_root)
+    df = load_noise_aggregate_table(results_root)
+
+    plots_root = results_root / "Plots"
+    plots_root.mkdir(parents=True, exist_ok=True)
+
+    plot_noise_by_species(df, plots_root)
+    plot_noise_by_architecture(df, plots_root)
+    save_noise_plot_manifest(results_root, plots_root, df)
+
+    print(f"Read noise results from:\n{results_root}")
+    print(f"Saved noise plots to:\n{plots_root}")
+    print("Created only these plot folders:")
+    print(f"  {plots_root / 'by_species'}")
+    print(f"  {plots_root / 'by_architecture'}")
+
+
+# ======================================================================================
+# Optional post-processing: real-K prediction exports
+# ======================================================================================
+
+
+def real_k_output_root():
+    return BASE_RESULTS_DIR / SCHEME / EXPERIMENT_NAME / "RealKPredictions"
+
+
+def real_k_distilled_output_root(output_root=None):
+    output_root = real_k_output_root() if output_root is None else Path(output_root)
+    return output_root / "Real_Ks_Distilled"
+
+
+def parse_hidden_size(hidden_size_text):
+    if isinstance(hidden_size_text, (tuple, list)):
+        return tuple(int(x) for x in hidden_size_text)
+
+    text = str(hidden_size_text).strip()
+    if not text:
+        raise ValueError("Empty hidden_size value.")
+
+    if "," in text:
+        return tuple(int(part.strip()) for part in text.split(",") if part.strip())
+
+    return (int(text),)
+
+
+def parse_species_list_from_string(text):
+    text = str(text).strip()
+    text = text.replace("[", "").replace("]", "").replace("'", "").replace('"', "")
+    species = [part.strip() for part in text.split(",") if part.strip()]
+    return species
+
+
+def update_noise_reconstruction_settings_from_run_info(noise_results_root):
+    global RESAMPLE_NEGATIVE_DENSITIES, MAX_NOISE_RESAMPLE_ATTEMPTS, CLIP_NEGATIVE_DENSITIES
+
+    info_path = Path(noise_results_root) / "noise_run_info.json"
+    if not info_path.exists():
+        return {}
+
+    info = load_json(info_path)
+    if "resample_negative_densities" in info:
+        RESAMPLE_NEGATIVE_DENSITIES = bool(info["resample_negative_densities"])
+    if "max_noise_resample_attempts" in info:
+        MAX_NOISE_RESAMPLE_ATTEMPTS = int(info["max_noise_resample_attempts"])
+    if "clip_negative_densities" in info:
+        CLIP_NEGATIVE_DENSITIES = bool(info["clip_negative_densities"])
+    return info
+
+
+def load_saved_model_for_real_k(scheme, kept_species, hidden_size, seed, input_size, output_size, activation="tanh"):
+    model_dir = saved_model_dir(scheme, kept_species, seed, hidden_size)
+    model_path = model_dir / "model.pth"
+    info_path = model_dir / "model_info.json"
+
+    if not model_path.exists():
+        raise FileNotFoundError(
+            f"Missing saved model:\n{model_path}\n"
+            "Run the noise robustness workflow first so the model exists in saved_weights."
+        )
+
+    if info_path.exists():
+        info = load_json(info_path)
+        activation = info.get("activation", activation)
+        input_size = int(info.get("input_size", input_size))
+        output_size = int(info.get("output_size", output_size))
+        hidden_size = tuple(info.get("hidden_size", list(hidden_size)))
+
+    model = NeuralNet(input_size, output_size, tuple(hidden_size), activ_f=activation)
+    state_dict = torch.load(model_path, map_location="cpu")
+    model.load_state_dict(state_dict)
+    model.eval()
+    return model
+
+
+def discover_real_k_species_result_folders(noise_results_root):
+    noise_results_root = Path(noise_results_root)
+    if not noise_results_root.exists():
+        raise FileNotFoundError(
+            f"Noise results root does not exist:\n{noise_results_root}\n"
+            "Run the noise robustness workflow first."
+        )
+
+    folders = []
+    for folder in sorted(noise_results_root.iterdir(), key=lambda p: p.name):
+        if not is_valid_direct_species_results_folder(folder):
+            continue
+        if SPECIES_CONFIG_NAMES_TO_EXPORT is not None and folder.name not in SPECIES_CONFIG_NAMES_TO_EXPORT:
+            continue
+        folders.append(folder)
+
+    if not folders:
+        raise FileNotFoundError(
+            f"No valid direct species-combination folders with noise_results.csv were found in:\n"
+            f"{noise_results_root}"
+        )
+
+    return folders
+
+
+def load_noise_results_for_real_k_species_folder(folder):
+    folder = Path(folder)
+    path = folder / "noise_results.csv"
+    df = pd.read_csv(path)
+
+    required_cols = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "input_size",
+        "output_size",
+        "hidden_size",
+        "seed",
+        "noise_repeat",
+        "noise_std",
+        "noise_percent",
+        "noise_label",
+        "noise_rng_seed",
+    ]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        raise ValueError(f"{path} is missing required columns: {', '.join(missing)}")
+
+    df = df[df["species_config_name"].astype(str) == folder.name].copy()
+
+    if ARCHITECTURES_TO_EXPORT is not None:
+        df = df[df["hidden_size"].astype(str).isin([str(a) for a in ARCHITECTURES_TO_EXPORT])]
+    if NOISE_PERCENTS_TO_EXPORT is not None:
+        wanted = set(float(x) for x in NOISE_PERCENTS_TO_EXPORT)
+        df = df[df["noise_percent"].astype(float).isin(wanted)]
+    if SEEDS_TO_EXPORT is not None:
+        wanted = set(int(x) for x in SEEDS_TO_EXPORT)
+        df = df[df["seed"].astype(int).isin(wanted)]
+    if NOISE_REPEATS_TO_EXPORT is not None:
+        wanted = set(int(x) for x in NOISE_REPEATS_TO_EXPORT)
+        df = df[df["noise_repeat"].astype(int).isin(wanted)]
+
+    duplicate_key = ["hidden_size", "seed", "noise_repeat", "noise_std"]
+    df = df.drop_duplicates(subset=duplicate_key, keep="last")
+
+    return df.reset_index(drop=True)
+
+
+def inverse_transform_outputs_to_real_k(dataset_test, outputs_scaled):
+    outputs_scaled = np.asarray(outputs_scaled, dtype=np.float64)
+    return dataset_test.scaler_output[0].inverse_transform(outputs_scaled) / 1e30
+
+
+def build_raw_real_k_prediction_dataframe(base_row, kept_species, dataset_test, model):
+    """Return the direct real-K predictions for one model/noise-realization row.
+
+    This dataframe is intentionally raw: it keeps the network seed, the noise repeat,
+    and the sample ID. No seed averaging, no noise-repeat averaging, and no ensemble
+    post-processing are applied here.
+    """
+    nspecies = dictionary[SCHEME]["n_densities"]
+    num_pressure_conditions = dictionary[SCHEME]["n_conditions"]
+
+    x_test_unscaled, _ = dataset_test.get_unscaled_data()
+    targets_real = dataset_test.y_data_unscaled.numpy().astype(np.float64)
+
+    noise_std = float(base_row["noise_std"])
+    rng_seed = int(base_row["noise_rng_seed"])
+    rng = np.random.default_rng(rng_seed)
+
+    x_noisy_unscaled = make_noisy_inputs_unscaled(
+        x_test_unscaled.numpy(),
+        noise_std=noise_std,
+        rng=rng,
+    )
+
+    x_noisy_scaled = transform_selected_unscaled_to_scaled(
+        x_noisy_unscaled,
+        kept_species=kept_species,
+        scaler_input=dataset_test.scaler_input,
+        num_pressure_conditions=num_pressure_conditions,
+        nspecies=nspecies,
+    )
+
+    outputs_scaled = predict_scaled(model, x_noisy_scaled)
+    outputs_real = inverse_transform_outputs_to_real_k(dataset_test, outputs_scaled)
+
+    n_samples = targets_real.shape[0]
+    output_size = targets_real.shape[1]
+
+    data = {
+        "scheme": [base_row["scheme"]] * n_samples,
+        "experiment_name": [base_row["experiment_name"]] * n_samples,
+        "species_config_name": [base_row["species_config_name"]] * n_samples,
+        "kept_species": [base_row["kept_species"]] * n_samples,
+        "num_species_kept": [int(base_row["num_species_kept"])] * n_samples,
+        "input_size": [int(base_row["input_size"])] * n_samples,
+        "output_size": [int(base_row["output_size"])] * n_samples,
+        "hidden_size": [str(base_row["hidden_size"])] * n_samples,
+        "seed": [int(base_row["seed"])] * n_samples,
+        "noise_repeat": [int(base_row["noise_repeat"])] * n_samples,
+        "noise_std": [noise_std] * n_samples,
+        "noise_percent": [float(base_row["noise_percent"])] * n_samples,
+        "noise_label": [str(base_row["noise_label"])] * n_samples,
+        "noise_rng_seed": [rng_seed] * n_samples,
+        "sample_id": np.arange(n_samples, dtype=int),
+    }
+
+    for i in range(output_size):
+        true_values = targets_real[:, i]
+        pred_values = outputs_real[:, i]
+        abs_error = np.abs(pred_values - true_values)
+        denominator = np.where(np.abs(true_values) < 1e-300, np.nan, true_values)
+        rel_error_percent = np.abs((pred_values - true_values) / denominator) * 100.0
+        pred_over_true = pred_values / denominator
+
+        k_name = f"k{i + 1}"
+        data[f"{k_name}_true_real"] = true_values
+        data[f"{k_name}_pred_real"] = pred_values
+        data[f"{k_name}_abs_error_real"] = abs_error
+        data[f"{k_name}_rel_error_percent"] = rel_error_percent
+        data[f"{k_name}_pred_over_true"] = pred_over_true
+
+    return pd.DataFrame(data)
+
+
+def get_output_size_from_real_k_raw_df(raw_df):
+    k_cols = [col for col in raw_df.columns if col.endswith("_true_real") and col.startswith("k")]
+    return len(k_cols)
+
+
+def aggregate_real_k_predictions(raw_df):
+    """Legacy-style aggregate over both NN seeds and noise repeats.
+
+    This is retained as a diagnostic file, not as the professor-facing Real-K table.
+    The professor-facing files in Real_Ks_Distilled use raw single-model predictions
+    and seed-only ensemble predictions instead.
+    """
+    if raw_df.empty:
+        return raw_df.copy()
+
+    output_size = get_output_size_from_real_k_raw_df(raw_df)
+
+    group_cols = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "input_size",
+        "output_size",
+        "hidden_size",
+        "noise_std",
+        "noise_percent",
+        "noise_label",
+        "sample_id",
+    ]
+
+    agg_dict = {
+        "seed": ["nunique"],
+        "noise_repeat": ["nunique", "count"],
+    }
+
+    for i in range(output_size):
+        k_name = f"k{i + 1}"
+        agg_dict[f"{k_name}_true_real"] = ["first"]
+        agg_dict[f"{k_name}_pred_real"] = ["mean", "std", "min", "max"]
+        agg_dict[f"{k_name}_abs_error_real"] = ["mean", "std", "min", "max"]
+        agg_dict[f"{k_name}_rel_error_percent"] = ["mean", "std", "min", "max"]
+        agg_dict[f"{k_name}_pred_over_true"] = ["mean", "std", "min", "max"]
+
+    agg = raw_df.groupby(group_cols, as_index=False).agg(agg_dict)
+    agg.columns = [
+        col if isinstance(col, str) else "_".join([c for c in col if c])
+        for col in agg.columns.to_flat_index()
+    ]
+
+    agg.rename(
+        columns={
+            "seed_nunique": "num_seeds",
+            "noise_repeat_nunique": "num_noise_repeats",
+            "noise_repeat_count": "num_evaluations",
+        },
+        inplace=True,
+    )
+
+    rename_true = {
+        f"k{i + 1}_true_real_first": f"k{i + 1}_true_real"
+        for i in range(output_size)
+        if f"k{i + 1}_true_real_first" in agg.columns
+    }
+    agg.rename(columns=rename_true, inplace=True)
+
+    rel_cols = [f"k{i + 1}_rel_error_percent_mean" for i in range(output_size)]
+    agg["mean_rel_error_percent_across_k"] = agg[rel_cols].mean(axis=1)
+
+    return agg.sort_values(
+        ["num_species_kept", "species_config_name", "hidden_size", "noise_percent", "sample_id"]
+    ).reset_index(drop=True)
+
+
+def raw_real_k_to_single_model_long(raw_df):
+    """Convert raw wide Real-K predictions to one row per K prediction."""
+    if raw_df is None or raw_df.empty:
+        return pd.DataFrame()
+
+    output_size = get_output_size_from_real_k_raw_df(raw_df)
+    base_cols = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "input_size",
+        "output_size",
+        "hidden_size",
+        "seed",
+        "noise_repeat",
+        "noise_std",
+        "noise_percent",
+        "noise_label",
+        "noise_rng_seed",
+        "sample_id",
+    ]
+
+    rows = []
+    for k in range(1, output_size + 1):
+        k_name = f"k{k}"
+        cols = base_cols + [
+            f"{k_name}_true_real",
+            f"{k_name}_pred_real",
+            f"{k_name}_abs_error_real",
+            f"{k_name}_rel_error_percent",
+            f"{k_name}_pred_over_true",
+        ]
+        k_df = raw_df[cols].copy()
+        k_df["K"] = f"K{k}"
+        k_df.rename(
+            columns={
+                f"{k_name}_true_real": "K_real",
+                f"{k_name}_pred_real": "K_predicted",
+                f"{k_name}_abs_error_real": "absolute_error_real",
+                f"{k_name}_rel_error_percent": "relative_error_percent",
+                f"{k_name}_pred_over_true": "predicted_over_real",
+            },
+            inplace=True,
+        )
+        rows.append(k_df)
+
+    long_df = pd.concat(rows, ignore_index=True)
+    long_df = long_df[
+        base_cols[:8]
+        + ["K", "seed", "noise_repeat", "noise_std", "noise_percent", "noise_label", "noise_rng_seed", "sample_id"]
+        + ["K_real", "K_predicted", "absolute_error_real", "relative_error_percent", "predicted_over_real"]
+    ]
+
+    return long_df.sort_values(
+        ["species_config_name", "hidden_size", "noise_percent", "seed", "noise_repeat", "sample_id", "K"]
+    ).reset_index(drop=True)
+
+
+def aggregate_real_k_seed_ensemble_predictions(raw_df):
+    """Average predictions over NN seeds only.
+
+    Noise repeats remain separate. This answers: for this same noisy input realization,
+    what does an ensemble over trained network seeds predict?
+    """
+    if raw_df is None or raw_df.empty:
+        return pd.DataFrame()
+
+    output_size = get_output_size_from_real_k_raw_df(raw_df)
+
+    group_cols = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "input_size",
+        "output_size",
+        "hidden_size",
+        "noise_std",
+        "noise_percent",
+        "noise_label",
+        "noise_repeat",
+        "sample_id",
+    ]
+
+    agg_dict = {"seed": ["nunique", "count"]}
+    for i in range(output_size):
+        k_name = f"k{i + 1}"
+        agg_dict[f"{k_name}_true_real"] = ["first"]
+        agg_dict[f"{k_name}_pred_real"] = ["mean", "std", "min", "max"]
+        agg_dict[f"{k_name}_abs_error_real"] = ["mean", "std", "min", "max"]
+        agg_dict[f"{k_name}_rel_error_percent"] = ["mean", "std", "min", "max"]
+        agg_dict[f"{k_name}_pred_over_true"] = ["mean", "std", "min", "max"]
+
+    agg = raw_df.groupby(group_cols, as_index=False).agg(agg_dict)
+    agg.columns = [
+        col if isinstance(col, str) else "_".join([c for c in col if c])
+        for col in agg.columns.to_flat_index()
+    ]
+
+    agg.rename(
+        columns={
+            "seed_nunique": "num_network_seeds",
+            "seed_count": "num_seed_predictions",
+        },
+        inplace=True,
+    )
+
+    for i in range(output_size):
+        k_name = f"k{i + 1}"
+        first_col = f"{k_name}_true_real_first"
+        if first_col in agg.columns:
+            agg.rename(columns={first_col: f"{k_name}_true_real"}, inplace=True)
+
+        true_col = f"{k_name}_true_real"
+        pred_mean_col = f"{k_name}_pred_real_mean"
+        ensemble_rel_col = f"{k_name}_ensemble_mean_rel_error_percent"
+        ensemble_abs_col = f"{k_name}_ensemble_mean_abs_error_real"
+        ensemble_ratio_col = f"{k_name}_ensemble_mean_pred_over_true"
+
+        denominator = np.where(np.abs(agg[true_col].to_numpy(dtype=float)) < 1e-300, np.nan, agg[true_col].to_numpy(dtype=float))
+        pred_mean = agg[pred_mean_col].to_numpy(dtype=float)
+        true_values = agg[true_col].to_numpy(dtype=float)
+
+        agg[ensemble_abs_col] = np.abs(pred_mean - true_values)
+        agg[ensemble_rel_col] = np.abs((pred_mean - true_values) / denominator) * 100.0
+        agg[ensemble_ratio_col] = pred_mean / denominator
+
+    return agg.sort_values(
+        ["num_species_kept", "species_config_name", "hidden_size", "noise_percent", "noise_repeat", "sample_id"]
+    ).reset_index(drop=True)
+
+
+def seed_ensemble_to_long(ensemble_df):
+    if ensemble_df is None or ensemble_df.empty:
+        return pd.DataFrame()
+
+    k_indices = sorted(
+        int(col.split("_")[0][1:])
+        for col in ensemble_df.columns
+        if col.startswith("k") and col.endswith("_true_real")
+    )
+
+    base_cols = [
+        "scheme",
+        "experiment_name",
+        "species_config_name",
+        "kept_species",
+        "num_species_kept",
+        "input_size",
+        "output_size",
+        "hidden_size",
+        "noise_std",
+        "noise_percent",
+        "noise_label",
+        "noise_repeat",
+        "sample_id",
+        "num_network_seeds",
+        "num_seed_predictions",
+    ]
+
+    rows = []
+    for k in k_indices:
+        k_name = f"k{k}"
+        cols = base_cols + [
+            f"{k_name}_true_real",
+            f"{k_name}_pred_real_mean",
+            f"{k_name}_pred_real_std",
+            f"{k_name}_pred_real_min",
+            f"{k_name}_pred_real_max",
+            f"{k_name}_ensemble_mean_abs_error_real",
+            f"{k_name}_ensemble_mean_rel_error_percent",
+            f"{k_name}_ensemble_mean_pred_over_true",
+            f"{k_name}_rel_error_percent_mean",
+            f"{k_name}_rel_error_percent_std",
+            f"{k_name}_rel_error_percent_min",
+            f"{k_name}_rel_error_percent_max",
+        ]
+        k_df = ensemble_df[cols].copy()
+        k_df["K"] = f"K{k}"
+        k_df.rename(
+            columns={
+                f"{k_name}_true_real": "K_real",
+                f"{k_name}_pred_real_mean": "K_predicted_seed_mean",
+                f"{k_name}_pred_real_std": "K_predicted_seed_std",
+                f"{k_name}_pred_real_min": "K_predicted_seed_min",
+                f"{k_name}_pred_real_max": "K_predicted_seed_max",
+                f"{k_name}_ensemble_mean_abs_error_real": "ensemble_mean_absolute_error_real",
+                f"{k_name}_ensemble_mean_rel_error_percent": "ensemble_mean_relative_error_percent",
+                f"{k_name}_ensemble_mean_pred_over_true": "ensemble_mean_predicted_over_real",
+                f"{k_name}_rel_error_percent_mean": "single_seed_relative_error_percent_mean",
+                f"{k_name}_rel_error_percent_std": "single_seed_relative_error_percent_std",
+                f"{k_name}_rel_error_percent_min": "single_seed_relative_error_percent_min",
+                f"{k_name}_rel_error_percent_max": "single_seed_relative_error_percent_max",
+            },
+            inplace=True,
+        )
+        rows.append(k_df)
+
+    long_df = pd.concat(rows, ignore_index=True)
+    long_df = long_df[
+        base_cols[:8]
+        + ["K", "noise_std", "noise_percent", "noise_label", "noise_repeat", "sample_id", "num_network_seeds", "num_seed_predictions"]
+        + [
+            "K_real",
+            "K_predicted_seed_mean",
+            "K_predicted_seed_std",
+            "K_predicted_seed_min",
+            "K_predicted_seed_max",
+            "ensemble_mean_absolute_error_real",
+            "ensemble_mean_relative_error_percent",
+            "ensemble_mean_predicted_over_real",
+            "single_seed_relative_error_percent_mean",
+            "single_seed_relative_error_percent_std",
+            "single_seed_relative_error_percent_min",
+            "single_seed_relative_error_percent_max",
+        ]
+    ]
+
+    return long_df.sort_values(
+        ["species_config_name", "hidden_size", "noise_percent", "noise_repeat", "sample_id", "K"]
+    ).reset_index(drop=True)
+
+
+def nearest_empirical_error_indices(n):
+    """Return closest actual-row indices for Min, 25%, 50%, 75%, and Max.
+
+    The 25/50/75 percentiles are empirical row selections, not interpolated values.
+    For example, with five sorted errors [1, 2, 3, 4, 5], this returns rows 2, 3, 4
+    for 25%, 50%, 75% respectively.
+    """
+    if n <= 0:
+        return []
+
+    specs = [
+        ("Min", 0),
+        ("25%", int(np.floor(0.25 * (n - 1) + 0.5))),
+        ("50%", int(np.floor(0.50 * (n - 1) + 0.5))),
+        ("75%", int(np.floor(0.75 * (n - 1) + 0.5))),
+        ("Max", n - 1),
+    ]
+    return specs
+
+
+def filter_distilled_noise_levels(df):
+    if df is None or df.empty:
+        return df
+    if REAL_K_DISTILLED_NOISE_PERCENTS is None:
+        return df.copy()
+    wanted = np.asarray([float(x) for x in REAL_K_DISTILLED_NOISE_PERCENTS], dtype=float)
+    noise_values = df["noise_percent"].astype(float).to_numpy()
+    mask = np.zeros(len(df), dtype=bool)
+    for value in wanted:
+        mask |= np.isclose(noise_values, value, rtol=0.0, atol=1e-9)
+    return df.loc[mask].copy()
+
+
+def select_distilled_rows(long_df, error_column, mode):
+    if long_df is None or long_df.empty:
+        return pd.DataFrame()
+
+    work = filter_distilled_noise_levels(long_df)
+    if work.empty:
+        return pd.DataFrame()
+
+    group_cols = ["species_config_name", "kept_species", "hidden_size", "noise_percent", "noise_label", "K"]
+    selected = []
+
+    for _, group in work.groupby(group_cols, sort=False):
+        group = group.dropna(subset=[error_column]).copy()
+        if group.empty:
+            continue
+        group = group.sort_values([error_column, "sample_id"]).reset_index(drop=True)
+        for label, idx in nearest_empirical_error_indices(len(group)):
+            row = group.iloc[int(idx)].copy()
+            row["error_statistic"] = label
+            row["selection_mode"] = mode
+            row["selection_error_column"] = error_column
+            selected.append(row)
+
+    if not selected:
+        return pd.DataFrame()
+
+    selected_df = pd.DataFrame(selected)
+
+    sort_cols = [
+        "species_config_name",
+        "K",
+        "noise_percent",
+        "hidden_size",
+        "error_statistic",
+    ]
+    statistic_order = {"Min": 0, "25%": 1, "50%": 2, "75%": 3, "Max": 4}
+    selected_df["__stat_order"] = selected_df["error_statistic"].map(statistic_order).fillna(99).astype(int)
+    selected_df = selected_df.sort_values(
+        ["species_config_name", "K", "noise_percent", "hidden_size", "__stat_order"]
+    ).drop(columns=["__stat_order"]).reset_index(drop=True)
+
+    return selected_df
+
+
+def format_noise_percent_for_table(value):
+    value = float(value)
+    if np.isclose(value, 0.0):
+        return "0%"
+    if float(value).is_integer():
+        return f"{int(value)}%"
+    return f"{value:g}%"
+
+
+def format_architecture_for_table(value):
+    return f"({str(value).strip()})"
+
+
+def format_real_k_table_value(value):
+    if pd.isna(value):
+        return "nan"
+    return REAL_K_FLOAT_FORMAT.format(float(value))
+
+
+def format_real_k_percent_value(value):
+    if pd.isna(value):
+        return "nan"
+    return REAL_K_PERCENT_FORMAT.format(float(value))
+
+
+def save_text_table(df, path, title=None):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w", encoding="utf-8") as f:
+        if title:
+            f.write(title.rstrip() + "\n")
+            f.write("=" * min(140, len(title)) + "\n\n")
+
+        if df is None or df.empty:
+            f.write("No rows available.\n")
+            return
+
+        with pd.option_context(
+            "display.max_rows",
+            None,
+            "display.max_columns",
+            None,
+            "display.width",
+            260,
+            "display.max_colwidth",
+            160,
+        ):
+            f.write(df.to_string(index=False))
+            f.write("\n")
+
+
+def write_single_model_distilled_tables_txt(distilled_df, path):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("Single-model distilled Real-K tables\n")
+        f.write("=" * 80 + "\n\n")
+        f.write(
+            "Each row is one direct prediction from one trained network seed and one noise repeat. "
+            "Rows are selected by actual empirical errors: Min, 25%, 50%, 75%, Max. "
+            "Percentile rows are nearest existing rows, not interpolated values.\n\n"
+        )
+
+        if distilled_df is None or distilled_df.empty:
+            f.write("No rows available.\n")
+            return
+
+        for (species_name, species_text, k_name), table_group in distilled_df.groupby(
+            ["species_config_name", "kept_species", "K"], sort=False
+        ):
+            f.write("#" * 120 + "\n")
+            f.write(f"Species: {species_text} | {k_name}\n")
+            f.write("#" * 120 + "\n")
+
+            display_rows = []
+            for _, row in table_group.iterrows():
+                display_rows.append(
+                    {
+                        "Noise": format_noise_percent_for_table(row["noise_percent"]),
+                        "Architecture": format_architecture_for_table(row["hidden_size"]),
+                        "Error statistic": row["error_statistic"],
+                        "Seed": int(row["seed"]),
+                        "Noise repeat": int(row["noise_repeat"]),
+                        "Sample": int(row["sample_id"]),
+                        f"Real {k_name}": format_real_k_table_value(row["K_real"]),
+                        f"Predicted {k_name}": format_real_k_table_value(row["K_predicted"]),
+                        "Rel. error (%)": format_real_k_percent_value(row["relative_error_percent"]),
+                    }
+                )
+
+            display_df = pd.DataFrame(display_rows)
+            with pd.option_context(
+                "display.max_rows",
+                None,
+                "display.max_columns",
+                None,
+                "display.width",
+                240,
+                "display.max_colwidth",
+                120,
+            ):
+                f.write(display_df.to_string(index=False))
+                f.write("\n\n")
+
+
+def write_seed_ensemble_distilled_tables_txt(distilled_df, path):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("Seed-ensemble distilled Real-K tables\n")
+        f.write("=" * 80 + "\n\n")
+        f.write(
+            "Each row is an ensemble prediction averaged over neural-network seeds only. "
+            "Noise repeats are kept separate and are not averaged. Rows are selected by "
+            "the relative error of the ensemble mean prediction: Min, 25%, 50%, 75%, Max. "
+            "Percentile rows are nearest existing rows, not interpolated values.\n\n"
+        )
+
+        if distilled_df is None or distilled_df.empty:
+            f.write("No rows available.\n")
+            return
+
+        for (species_name, species_text, k_name), table_group in distilled_df.groupby(
+            ["species_config_name", "kept_species", "K"], sort=False
+        ):
+            f.write("#" * 120 + "\n")
+            f.write(f"Species: {species_text} | {k_name}\n")
+            f.write("#" * 120 + "\n")
+
+            display_rows = []
+            for _, row in table_group.iterrows():
+                display_rows.append(
+                    {
+                        "Noise": format_noise_percent_for_table(row["noise_percent"]),
+                        "Architecture": format_architecture_for_table(row["hidden_size"]),
+                        "Error statistic": row["error_statistic"],
+                        "Noise repeat": int(row["noise_repeat"]),
+                        "Sample": int(row["sample_id"]),
+                        "NN seeds": int(row["num_network_seeds"]),
+                        f"Real {k_name}": format_real_k_table_value(row["K_real"]),
+                        f"Predicted {k_name}": format_real_k_table_value(row["K_predicted_seed_mean"]),
+                        f"Std {k_name}": format_real_k_table_value(row["K_predicted_seed_std"]),
+                        "Rel. error (%)": format_real_k_percent_value(row["ensemble_mean_relative_error_percent"]),
+                    }
+                )
+
+            display_df = pd.DataFrame(display_rows)
+            with pd.option_context(
+                "display.max_rows",
+                None,
+                "display.max_columns",
+                None,
+                "display.width",
+                260,
+                "display.max_colwidth",
+                120,
+            ):
+                f.write(display_df.to_string(index=False))
+                f.write("\n\n")
+
+
+def save_distilled_readme(distilled_root, files_info):
+    distilled_root = Path(distilled_root)
+    distilled_root.mkdir(parents=True, exist_ok=True)
+
+    lines = [
+        "Real_Ks_Distilled",
+        "=================",
+        "",
+        "This folder contains the professor-facing real-K prediction tables.",
+        "",
+        "Definitions:",
+        "- single_model: direct model outputs. No averaging over neural-network seeds and no averaging over noise repeats.",
+        "- seed_ensemble: ensemble outputs averaged over neural-network seeds only. Noise repeats remain separate.",
+        "- Error statistic: actual empirical row selected after sorting by relative error. Min, 25%, 50%, 75%, and Max are real rows, not interpolated percentile values.",
+        "",
+        "Important:",
+        "- 0% noise repeats are identical by construction, because no noise is applied.",
+        "- The parent RealKPredictions folder may also contain diagnostic raw/aggregate files.",
+        "- The removed old SimpleTables output used aggregate mean predictions and is intentionally not generated here.",
+        "",
+        "Files:",
+    ]
+
+    for label, path in files_info:
+        lines.append(f"- {label}: {Path(path).name}")
+
+    (distilled_root / "README.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def save_distilled_real_k_outputs(global_raw, output_root):
+    """Save professor-facing Real-K files under RealKPredictions/Real_Ks_Distilled."""
+    output_root = Path(output_root)
+    distilled_root = real_k_distilled_output_root(output_root)
+    distilled_root.mkdir(parents=True, exist_ok=True)
+
+    saved_files = []
+
+    if global_raw is None or global_raw.empty:
+        save_distilled_readme(distilled_root, [])
+        print("Skipping distilled Real-K outputs: global raw table is empty.")
+        return []
+
+    single_long = raw_real_k_to_single_model_long(global_raw)
+    ensemble_wide = aggregate_real_k_seed_ensemble_predictions(global_raw)
+    ensemble_long = seed_ensemble_to_long(ensemble_wide)
+
+    single_all_path = distilled_root / "real_k_single_model_outputs.csv"
+    single_long.to_csv(single_all_path, index=False)
+    saved_files.append(("single_model all direct predictions", single_all_path))
+
+    ensemble_all_path = distilled_root / "real_k_seed_ensemble_outputs.csv"
+    ensemble_long.to_csv(ensemble_all_path, index=False)
+    saved_files.append(("seed_ensemble all predictions averaged over NN seeds only", ensemble_all_path))
+
+    single_distilled = select_distilled_rows(
+        single_long,
+        error_column="relative_error_percent",
+        mode="single_model",
+    )
+    single_distilled_path = distilled_root / "real_k_single_model_distilled_rows.csv"
+    single_distilled.to_csv(single_distilled_path, index=False)
+    saved_files.append(("single_model distilled empirical error rows", single_distilled_path))
+
+    single_txt_path = distilled_root / "real_k_single_model_distilled_tables.txt"
+    write_single_model_distilled_tables_txt(single_distilled, single_txt_path)
+    saved_files.append(("single_model readable distilled tables", single_txt_path))
+
+    ensemble_distilled = select_distilled_rows(
+        ensemble_long,
+        error_column="ensemble_mean_relative_error_percent",
+        mode="seed_ensemble",
+    )
+    ensemble_distilled_path = distilled_root / "real_k_seed_ensemble_distilled_rows.csv"
+    ensemble_distilled.to_csv(ensemble_distilled_path, index=False)
+    saved_files.append(("seed_ensemble distilled empirical error rows", ensemble_distilled_path))
+
+    ensemble_txt_path = distilled_root / "real_k_seed_ensemble_distilled_tables.txt"
+    write_seed_ensemble_distilled_tables_txt(ensemble_distilled, ensemble_txt_path)
+    saved_files.append(("seed_ensemble readable distilled tables", ensemble_txt_path))
+
+    distilled_info = {
+        "description": "Professor-facing distilled real-K prediction outputs.",
+        "output_root": str(distilled_root),
+        "single_model_definition": "Direct predictions from individual trained neural networks. No averaging over network seeds or noise repeats.",
+        "seed_ensemble_definition": "Predictions averaged over neural-network seeds only. Noise repeats remain separate and are not averaged.",
+        "error_statistics": ["Min", "25%", "50%", "75%", "Max"],
+        "percentile_policy": "Nearest actual empirical row after sorting by relative error; no interpolation.",
+        "distilled_noise_percents": REAL_K_DISTILLED_NOISE_PERCENTS,
+        "single_model_rows": int(len(single_long)),
+        "single_model_distilled_rows": int(len(single_distilled)),
+        "seed_ensemble_rows": int(len(ensemble_long)),
+        "seed_ensemble_distilled_rows": int(len(ensemble_distilled)),
+        "saved_files": [str(path) for _, path in saved_files],
+    }
+    save_json(distilled_root / "distilled_export_info.json", distilled_info)
+    saved_files.append(("distilled export metadata", distilled_root / "distilled_export_info.json"))
+
+    save_distilled_readme(distilled_root, saved_files)
+    saved_files.append(("readme", distilled_root / "README.txt"))
+
+    print("\nSaved distilled real-K outputs to:")
+    print(f"  {distilled_root}")
+    for label, path in saved_files:
+        print(f"  {Path(path).name}  ({label})")
+
+    return [str(path) for _, path in saved_files]
+
+
+def format_real_k_float(value, percent=False):
+    if pd.isna(value):
+        return "nan"
+    if percent:
+        return REAL_K_PERCENT_FORMAT.format(float(value))
+    return REAL_K_FLOAT_FORMAT.format(float(value))
+
+
+def write_dataframe_as_text_table(df, path, title=None):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w", encoding="utf-8") as f:
+        if title:
+            f.write(title.rstrip() + "\n")
+            f.write("=" * min(120, len(title)) + "\n\n")
+
+        if df.empty:
+            f.write("No rows available.\n")
+            return
+
+        with pd.option_context(
+            "display.max_rows",
+            None,
+            "display.max_columns",
+            None,
+            "display.width",
+            240,
+            "display.max_colwidth",
+            120,
+            "display.float_format",
+            lambda x: REAL_K_FLOAT_FORMAT.format(x),
+        ):
+            if REAL_K_TXT_BLOCK_SEPARATOR_EVERY is None or REAL_K_TXT_BLOCK_SEPARATOR_EVERY <= 0:
+                f.write(df.to_string(index=False))
+                f.write("\n")
+            else:
+                for start in range(0, len(df), REAL_K_TXT_BLOCK_SEPARATOR_EVERY):
+                    block = df.iloc[start : start + REAL_K_TXT_BLOCK_SEPARATOR_EVERY]
+                    f.write(f"Rows {start} to {start + len(block) - 1}\n")
+                    f.write("-" * 120 + "\n")
+                    f.write(block.to_string(index=False))
+                    f.write("\n\n")
+
+
+def export_real_k_species_folder(folder, output_root):
+    folder = Path(folder)
+    noise_df = load_noise_results_for_real_k_species_folder(folder)
+
+    if noise_df.empty:
+        print(f"Skipping {folder.name}: no rows after filters.")
+        return None, None, None
+
+    kept_species = parse_species_list_from_string(noise_df["kept_species"].iloc[0])
+    validate_species_config(kept_species)
+
+    species_config_name = species_config_to_name(kept_species)
+    if species_config_name != folder.name:
+        raise ValueError(
+            f"Folder name {folder.name!r} does not match kept_species-derived name {species_config_name!r}."
+        )
+
+    _, dataset_test = load_datasets_with_saved_scalers(SCHEME, kept_species)
+    x_test, y_test = dataset_test.get_data()
+    input_size = int(x_test.shape[1])
+    output_size = int(y_test.shape[1])
+
+    species_output_root = Path(output_root) / "by_species" / species_config_name
+    species_output_root.mkdir(parents=True, exist_ok=True)
+
+    raw_parts = []
+    model_cache = {}
+
+    iterator = noise_df.iterrows()
+    progress = tqdm(
+        iterator,
+        total=len(noise_df),
+        desc=f"Export real K | {species_config_name}",
+    )
+
+    for _, row in progress:
+        hidden_size_text = str(row["hidden_size"])
+        hidden_size = parse_hidden_size(hidden_size_text)
+        seed = int(row["seed"])
+
+        model_key = (hidden_size_text, seed)
+        if model_key not in model_cache:
+            model_cache[model_key] = load_saved_model_for_real_k(
+                SCHEME,
+                kept_species,
+                hidden_size,
+                seed,
+                input_size=input_size,
+                output_size=output_size,
+                activation=ACTIVATION,
+            )
+
+        model = model_cache[model_key]
+        raw_df_part = build_raw_real_k_prediction_dataframe(
+            base_row=row,
+            kept_species=kept_species,
+            dataset_test=dataset_test,
+            model=model,
+        )
+        raw_parts.append(raw_df_part)
+
+        progress.set_postfix(
+            arch=hidden_size_text,
+            seed=seed,
+            noise=f"{float(row['noise_percent']):g}%",
+        )
+
+    raw_df = pd.concat(raw_parts, ignore_index=True)
+    raw_df = raw_df.sort_values(
+        ["hidden_size", "seed", "noise_percent", "noise_repeat", "sample_id"]
+    ).reset_index(drop=True)
+
+    agg_df = aggregate_real_k_predictions(raw_df)
+
+    if SAVE_REAL_K_RAW_CSV:
+        raw_df.to_csv(species_output_root / "real_k_predictions_raw.csv", index=False)
+
+    if SAVE_REAL_K_AGGREGATE_CSV:
+        agg_df.to_csv(species_output_root / "real_k_predictions_aggregate_by_sample.csv", index=False)
+
+    if SAVE_REAL_K_FULL_TEXT_TABLE:
+        table_df = agg_df if REAL_K_FULL_TEXT_TABLE_SOURCE == "aggregate" else raw_df
+        write_dataframe_as_text_table(
+            table_df,
+            species_output_root / "real_k_predictions_full_table.txt",
+            title=f"Full real-K prediction table | Species: {agg_df['kept_species'].iloc[0]}",
+        )
+
+    return raw_df, agg_df, species_output_root
+
+
+def save_real_k_global_outputs(raw_dfs, agg_dfs, output_root):
+    output_root = Path(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    global_raw = pd.concat(raw_dfs, ignore_index=True) if raw_dfs else pd.DataFrame()
+    global_agg = pd.concat(agg_dfs, ignore_index=True) if agg_dfs else pd.DataFrame()
+
+    if not global_raw.empty:
+        global_raw = global_raw.sort_values(
+            [
+                "num_species_kept",
+                "species_config_name",
+                "hidden_size",
+                "seed",
+                "noise_percent",
+                "noise_repeat",
+                "sample_id",
+            ]
+        ).reset_index(drop=True)
+
+    if not global_agg.empty:
+        global_agg = global_agg.sort_values(
+            [
+                "num_species_kept",
+                "species_config_name",
+                "hidden_size",
+                "noise_percent",
+                "sample_id",
+            ]
+        ).reset_index(drop=True)
+
+    if SAVE_REAL_K_GLOBAL_RAW_CSV and SAVE_REAL_K_RAW_CSV and not global_raw.empty:
+        global_raw.to_csv(output_root / "fullrun_real_k_predictions_raw.csv", index=False)
+
+    if SAVE_REAL_K_GLOBAL_AGGREGATE_CSV and SAVE_REAL_K_AGGREGATE_CSV and not global_agg.empty:
+        global_agg.to_csv(output_root / "fullrun_real_k_predictions_aggregate_by_sample.csv", index=False)
+
+    if SAVE_REAL_K_FULL_TEXT_TABLE:
+        if REAL_K_FULL_TEXT_TABLE_SOURCE == "raw" and not global_raw.empty:
+            table_df = global_raw
+        else:
+            table_df = global_agg
+
+        if table_df is not None and not table_df.empty:
+            write_dataframe_as_text_table(
+                table_df,
+                output_root / "fullrun_real_k_predictions_full_table.txt",
+                title="Full real-K prediction table | All exported species combinations",
+            )
+
+    return global_raw, global_agg
+
+
+def export_real_k_predictions(noise_results_root=None):
+    noise_results_root = Path(noise_results_root) if noise_results_root is not None else BASE_RESULTS_DIR / SCHEME / EXPERIMENT_NAME / "Noise_MSE_Results"
+    output_root = real_k_output_root()
+
+    update_noise_reconstruction_settings_from_run_info(noise_results_root)
+
+    output_root.mkdir(parents=True, exist_ok=True)
+    species_folders = discover_real_k_species_result_folders(noise_results_root)
+
+    print("Exporting real-K predictions from species folders:")
+    for folder in species_folders:
+        print(f"  {folder.name}")
+    print()
+
+    raw_dfs = []
+    agg_dfs = []
+    species_output_dirs = []
+
+    for folder in species_folders:
+        raw_df, agg_df, species_output_root = export_real_k_species_folder(folder, output_root)
+        if raw_df is not None and not raw_df.empty:
+            raw_dfs.append(raw_df)
+        if agg_df is not None and not agg_df.empty:
+            agg_dfs.append(agg_df)
+        if species_output_root is not None:
+            species_output_dirs.append(str(species_output_root))
+
+    global_raw, global_agg = save_real_k_global_outputs(raw_dfs, agg_dfs, output_root)
+
+    distilled_files = []
+    if SAVE_REAL_K_DISTILLED_TABLES:
+        distilled_files = save_distilled_real_k_outputs(global_raw, output_root)
+
+    export_info = {
+        "scheme": SCHEME,
+        "experiment_name": EXPERIMENT_NAME,
+        "noise_results_root": str(noise_results_root),
+        "saved_weights_root": str(SAVED_WEIGHTS_ROOT),
+        "output_root": str(output_root),
+        "distilled_output_root": str(real_k_distilled_output_root(output_root)),
+        "species_folders_exported": [folder.name for folder in species_folders],
+        "species_output_dirs": species_output_dirs,
+        "architectures_to_export": ARCHITECTURES_TO_EXPORT,
+        "noise_percents_to_export": NOISE_PERCENTS_TO_EXPORT,
+        "seeds_to_export": SEEDS_TO_EXPORT,
+        "noise_repeats_to_export": NOISE_REPEATS_TO_EXPORT,
+        "distilled_noise_percents": REAL_K_DISTILLED_NOISE_PERCENTS,
+        "resample_negative_densities": RESAMPLE_NEGATIVE_DENSITIES,
+        "max_noise_resample_attempts": MAX_NOISE_RESAMPLE_ATTEMPTS,
+        "clip_negative_densities": CLIP_NEGATIVE_DENSITIES,
+        "save_raw_csv": SAVE_REAL_K_RAW_CSV,
+        "save_aggregate_csv": SAVE_REAL_K_AGGREGATE_CSV,
+        "save_full_text_table": SAVE_REAL_K_FULL_TEXT_TABLE,
+        "full_text_table_source": REAL_K_FULL_TEXT_TABLE_SOURCE,
+        "save_distilled_tables": SAVE_REAL_K_DISTILLED_TABLES,
+        "distilled_files": distilled_files,
+        "num_distilled_files": int(len(distilled_files)),
+        "simple_tables_removed": True,
+        "simple_tables_reason": "The old SimpleTables output used aggregate mean predictions and could hide individual model errors.",
+        "global_raw_rows": int(len(global_raw)),
+        "global_aggregate_rows": int(len(global_agg)),
+    }
+    save_json(output_root / "export_info.json", export_info)
+
+    print("\nSaved real-K prediction exports to:")
+    print(output_root)
+    print("\nMain files:")
+    if SAVE_REAL_K_GLOBAL_RAW_CSV and SAVE_REAL_K_RAW_CSV:
+        print(f"  {output_root / 'fullrun_real_k_predictions_raw.csv'}")
+    if SAVE_REAL_K_GLOBAL_AGGREGATE_CSV and SAVE_REAL_K_AGGREGATE_CSV:
+        print(f"  {output_root / 'fullrun_real_k_predictions_aggregate_by_sample.csv'}")
+    if SAVE_REAL_K_FULL_TEXT_TABLE:
+        print(f"  {output_root / 'fullrun_real_k_predictions_full_table.txt'}")
+    if SAVE_REAL_K_DISTILLED_TABLES:
+        print(f"  {real_k_distilled_output_root(output_root)}")
 
 
 def main():

@@ -7,3 +7,5 @@ Images/**/*.png
 __pycache__/
 *.png
 .vscode/
+"Results_NN/" 
+/Results_NN/

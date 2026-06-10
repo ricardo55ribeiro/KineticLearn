@@ -1,9 +1,0 @@
-{
-    "hidden_size": [
-        30,
-        30,
-        30
-    ],
-    "depth": 3,
-    "num_parameters": 2523
-}

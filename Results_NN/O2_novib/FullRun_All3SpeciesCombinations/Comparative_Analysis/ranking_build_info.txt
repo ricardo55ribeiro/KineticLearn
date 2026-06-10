@@ -1,3 +1,0 @@
-Source FullRun directory: Results_NN\O2_novib\FullRun_All3SpeciesCombinations
-Number of available combinations ranked: 21
-Architectures included: 30, 30, 30, 30, 30, 50, 50

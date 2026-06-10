@@ -1,8 +1,0 @@
-{
-    "hidden_size": [
-        50,
-        50
-    ],
-    "depth": 2,
-    "num_parameters": 3453
-}

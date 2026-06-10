@@ -1,0 +1,66 @@
+{
+    "scheme": "O2_novib",
+    "kept_species": [
+        "O2(a)",
+        "O(3P)",
+        "O3(X)"
+    ],
+    "hidden_size": [
+        30,
+        30
+    ],
+    "seed": 38,
+    "activation": "tanh",
+    "input_size": 6,
+    "output_size": 3,
+    "k_columns": [
+        0,
+        1,
+        2
+    ],
+    "num_pressure_conditions": 2,
+    "split_seed": 38,
+    "shuffle_seed": 38,
+    "weight_seed": 38,
+    "depth": 2,
+    "num_parameters": 1233,
+    "num_species_total": 11,
+    "num_species_kept": 3,
+    "removed_species": [
+        "O2(X)",
+        "O2(b)",
+        "O2(Hz)",
+        "O2+(X)",
+        "O(1D)",
+        "O+(gnd)",
+        "O-(gnd)",
+        "O3(exc)"
+    ],
+    "feature_names": [
+        "O2(a)_p1",
+        "O(3P)_p1",
+        "O3(X)_p1",
+        "O2(a)_p2",
+        "O(3P)_p2",
+        "O3(X)_p2"
+    ],
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "max_epochs": 5000,
+    "patience": 100,
+    "val_split": 0.1,
+    "epochs_ran": 2787,
+    "best_epoch": 2687,
+    "final_train_loss": 4.404959841445412e-06,
+    "final_val_loss": 4.255543176441279e-06,
+    "best_val_loss": 3.2114089435708593e-06,
+    "training_time_s": 200.8672034740448,
+    "test_mse_scaled": 3.5907537683913898e-06,
+    "test_rmse_scaled": 0.0018949284335803792,
+    "k1_mse_scaled": 7.765606232501554e-06,
+    "k1_rmse_scaled": 0.002786683733849529,
+    "k2_mse_scaled": 2.106079085804069e-06,
+    "k2_rmse_scaled": 0.00145123364273437,
+    "k3_mse_scaled": 9.005759868685459e-07,
+    "k3_rmse_scaled": 0.0009489868212301717
+}
